@@ -1,7 +1,7 @@
 FROM python:3.12-alpine
 
 # Install build dependencies
-RUN apk add --no-cache gcc musl-dev libffi-dev postgresql-dev tzdata
+RUN apk add --no-cache gcc musl libffi postgresql tzdata
 RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
 
 # Set workdir
