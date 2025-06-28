@@ -1,0 +1,32 @@
+
+services:
+  rationarr-app:
+    build: .
+    container_name: rationarr-app
+    command: ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"] # , "--workers", "4"
+    ports:
+      - "8008:8000"
+    environment:
+      - DATABASE_URI=postgresql+asyncpg://postgres:postgres@rationarr-db:5432/rationarr
+    depends_on:
+      - rationarr-db
+    volumes:
+      - ./src/app:/code/app
+      - ./alembic:/code/alembic
+      - ./alembic.ini:/code/alembic.ini
+
+  rationarr-db:
+    image: postgres:17
+    container_name: rationarr-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=rationarr
+    # optional for debug
+    # ports:
+    #   - "5432:5432"
+    volumes:
+      - rationarr_pgdata:/var/lib/postgresql/data
+
+volumes:
+  rationarr_pgdata:
