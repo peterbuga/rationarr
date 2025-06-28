@@ -1,6 +1,5 @@
 when:
   - event: ["tag", "push", "manual", "cron"]
-    branch: "woodpecker"
 
 labels:
   builder: "amd64arm64"
