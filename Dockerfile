@@ -2,7 +2,7 @@ FROM node:22-slim AS build
 
 WORKDIR /code
 
-COPY package.json package-lock.json tsconfig.json vite.config.ts /code/
+COPY package.json package-lock.json tsconfig.json /code/
 COPY src/web /code/src/web
 
 RUN npm install && npm run build
