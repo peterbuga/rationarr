@@ -28,17 +28,14 @@ COPY alembic/ ./alembic/
 COPY alembic.ini .
 COPY --from=build /code/dist ./dist
 
+# Run the app with uvicorn
 COPY <<-EOT /entrypoint.sh
 #!/bin/sh
 
 alembic upgrade head
 uvicorn app.main:app --host 0.0.0.0 --proxy-headers --port 8000 --workers 4
 EOT
-
 RUN chmod +x /entrypoint.sh
 
-# Expose FastAPI port
 EXPOSE 8000
-
-# Run the app with uvicorn
-CMD ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
