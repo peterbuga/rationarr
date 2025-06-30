@@ -4,17 +4,15 @@ import sys
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import get_db
-
+from app.dependencies import DbSessionDep
 from app.indexers import *
 from app.models.indexer import IndexerOutputModel
-
 
 router = APIRouter()
 
 
-@router.get("/", response_model=list[IndexerOutputModel])
-async def get_trackers(session: AsyncSession = Depends(get_db)):
+@router.get("", response_model=list[IndexerOutputModel])
+async def get_trackers(session: DbSessionDep):
     indexers = {}
     # TODO: clean the hackish
     for name_obj, obj in inspect.getmembers(sys.modules[__name__]):

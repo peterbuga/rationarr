@@ -4,13 +4,14 @@ import uuid
 
 import httpx
 from bs4 import BeautifulSoup
+from slugify import slugify
+from sqlalchemy import update
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.indexers.base_indexer import BaseIndexer
 from app.models import Scraper
 from app.models.tracker import Tracker
 from app.schemas.myanonamousenet import MyanonamousenetScraperFields
-from slugify import slugify
-from sqlalchemy import update
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class Myanonamousenet(BaseIndexer):

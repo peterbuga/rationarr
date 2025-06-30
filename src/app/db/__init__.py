@@ -1,9 +1,8 @@
-import os
 from contextlib import contextmanager
 from typing import Annotated, Generator, Iterator
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from app.config import settings
 
@@ -12,13 +11,7 @@ AsyncSessionLocal = sessionmaker(
     bind=engine, class_=AsyncSession, expire_on_commit=False
 )
 
-
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
-
-
-@contextmanager
-def get_db_session() -> Iterator[Session]:
-    db = AsyncSessionLocal()
-    yield db
+# @contextmanager
+# def get_db_session() -> Iterator[Session]:
+#     db = AsyncSessionLocal()
+#     yield db

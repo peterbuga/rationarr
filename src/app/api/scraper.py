@@ -6,10 +6,8 @@ from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import aggregate_order_by
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import get_db
+from app.dependencies import DbSessionDep
 from app.models.scraper import Scraper, ScraperDataOutputModel
-
-
 
 router = APIRouter()
 
@@ -17,7 +15,7 @@ from sqlalchemy import select
 
 
 @router.get("/{id}", response_model=ScraperDataOutputModel)
-async def scraped_data(id: uuid.UUID, session: AsyncSession = Depends(get_db)):
+async def scraped_data(id: uuid.UUID, db: DbSessionDep):
     stmt = (
         select(
             Scraper.attribute,
@@ -30,7 +28,7 @@ async def scraped_data(id: uuid.UUID, session: AsyncSession = Depends(get_db)):
         .group_by(Scraper.attribute)
     )
     logging.error(f"{stmt}")
-    result = await session.execute(stmt)
+    result = await db.execute(stmt)
     # columns = result.keys()
     # for row in result:
     #     print(dict(zip(columns, row)))

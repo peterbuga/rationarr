@@ -1,17 +1,29 @@
 
 services:
+  rationarr-web:
+    image: node:22-slim
+    container_name: rationarr-web
+    hostname: rationarr-web
+    command: "/bin/bash -c 'test -d /app/node_modules || npm ci && npm run dev'"
+    working_dir: '/app'
+    ports:
+      - '5173:5173'
+    volumes:
+      - './:/app'
   rationarr-app:
+    image: rationarr-app
     build: .
     container_name: rationarr-app
-    command: ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"] # , "--workers", "4"
     ports:
-      - "8008:8000"
+      - "8000:8000"
     environment:
-      - DATABASE_URI=postgresql+asyncpg://postgres:postgres@rationarr-db:5432/rationarr
+      DATABASE_URI: postgresql+asyncpg://postgres:postgres@rationarr-db:5432/rationarr
+      DEBUG: true
     depends_on:
       - rationarr-db
     volumes:
       - ./src/app:/code/app
+      # - ./dist:/code/dist
       - ./alembic:/code/alembic
       - ./alembic.ini:/code/alembic.ini
 
@@ -22,9 +34,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=rationarr
-    # optional for debug
-    # ports:
-    #   - "5432:5432"
+    ports:
+      - "5432:5432"
     volumes:
       - rationarr_pgdata:/var/lib/postgresql/data
 

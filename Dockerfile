@@ -1,3 +1,12 @@
+FROM node:22-slim AS build
+
+WORKDIR /code
+
+COPY package.json package-lock.json tsconfig.json vite.config.ts /code/
+COPY src/web /code/src/web
+
+RUN npm install && npm run build
+
 FROM python:3.12-alpine
 
 # Install build dependencies
@@ -15,7 +24,7 @@ RUN pip install --no-cache-dir -e .
 COPY src/app/ ./app/
 COPY alembic/ ./alembic/
 COPY alembic.ini .
-
+COPY --from=build /code/dist ./dist
 
 # Expose FastAPI port
 EXPOSE 8000

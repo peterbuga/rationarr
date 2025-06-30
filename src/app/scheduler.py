@@ -5,8 +5,9 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy import select
 
 from app.db import AsyncSessionLocal
-from app.models.tracker import Tracker
 from app.dependencies import get_scheduler
+from app.models.tracker import Tracker
+
 
 async def scheduled_crawl(tracker: Tracker):
     try:
@@ -22,6 +23,7 @@ async def scheduled_crawl(tracker: Tracker):
             await tracker_instance.extract_info(session)
         except Exception as e:
             logging.error(f"Failed to crawl {tracker.url}: {e}")
+
 
 async def start_scheduler():
     async with AsyncSessionLocal() as db:

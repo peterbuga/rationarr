@@ -22,7 +22,7 @@ class Unit3d(BaseIndexer):
             endpoint_url = f"{self.url}/api/user?api_token={self.api_key}"
             response = await client.get(endpoint_url, timeout=10)
             response.raise_for_status()
-            logging.debug(f"{self.url} crawled {response.text}")
+            # logging.debug(f"{self.url} crawled {response.text}")
 
             scrapers = []
             for attribute, value in response.json().items():
@@ -37,7 +37,7 @@ class Unit3d(BaseIndexer):
                         )
                     )
                 else:
-                    logging.warning(f"Field not tracked: {attribute} = {value}")
+                    logging.debug(f"Field not tracked: {attribute} = {value}")
 
             session.add_all(scrapers)
             await session.commit()

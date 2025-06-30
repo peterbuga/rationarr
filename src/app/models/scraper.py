@@ -3,12 +3,7 @@ from datetime import datetime, timezone
 from typing import Dict
 
 from pydantic import BaseModel
-from sqlalchemy import (
-    Column,
-    ForeignKey,
-    String,
-    Uuid,
-)
+from sqlalchemy import Column, ForeignKey, String, Uuid
 from sqlalchemy.sql import func
 
 from app.db.base import Base
