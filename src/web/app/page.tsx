@@ -39,7 +39,7 @@ export default function Page() {
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               {/* <SectionCards /> */}
               {/* @typescript-eslint/no-explicit-any */}
-              {data?.map((indexer: any, i: number) => {
+              {data?.filter((item: any) => { return item.active}).map((indexer: any, i: number) => {
                 return (
                   <div className="px-4 lg:px-6" key={i}>
                     <ChartAreaInteractive indexer={indexer}/>

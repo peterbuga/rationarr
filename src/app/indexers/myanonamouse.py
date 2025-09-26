@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.indexers.base_indexer import BaseIndexer
 from app.models import Scraper
 from app.models.indexer import Indexer
-from app.schemas.mam import MamScraperFields
+from app.schemas.myanonamouse import MyanonamouseScraperFields
 
 
 class Myanonamouse(BaseIndexer):
@@ -56,7 +56,7 @@ class Myanonamouse(BaseIndexer):
                 Scraper(
                     **{
                         "indexer_id": self.indexer_id,
-                        "attribute": getattr(MamScraperFields, "points"),
+                        "attribute": getattr(MyanonamouseScraperFields, "points"),
                         "value": points.text.lower()
                         .replace("bonus:", "")
                         .strip(),
@@ -84,13 +84,13 @@ class Myanonamouse(BaseIndexer):
                     "class", "class_"
                 )
 
-                if attribute in MamScraperFields.get_keys():
+                if attribute in MyanonamouseScraperFields.get_keys():
                     scrapers.append(
                         Scraper(
                             **{
                                 "indexer_id": self.indexer_id,
                                 "attribute": getattr(
-                                    MamScraperFields, attribute
+                                    MyanonamouseScraperFields, attribute
                                 ),
                                 "value": str(value),
                             }

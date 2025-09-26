@@ -40,6 +40,7 @@ async def start_scheduler():
     for indexer in indexers:
         # if tracker.alias != 'MAM':
         #     continue
+        logging.info(f"Job interval added for {indexer.name}")
         scheduler.add_job(
             scheduled_crawl,
             max_instances=1,

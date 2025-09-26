@@ -43,4 +43,7 @@ class ScraperDataOutputModel(BaseModel):
     seed: Dict[datetime, int] = dict()
     leech: Dict[datetime, int] = dict()
     hnr: Dict[datetime, int] = dict()
+    points: Dict[datetime, float] = dict()
+    # download: Dict[datetime, float] = dict()
+    # upload: Dict[datetime, float] = dict()
     # test: Optional[Dict[datetime, int]] = {}

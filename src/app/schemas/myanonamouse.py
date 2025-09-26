@@ -1,7 +1,7 @@
 from app.schemas.common import EnhancedStrEnum, ScraperFields
 
 
-class MamScraperFields(EnhancedStrEnum):
+class MyanonamouseScraperFields(EnhancedStrEnum):
     # username = "user"
     class_ = ScraperFields.user_class.value
     uploaded = ScraperFields.upload.value

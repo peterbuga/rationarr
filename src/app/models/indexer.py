@@ -65,7 +65,7 @@ class IndexerOutputModel(TimestampedModel):
     id: str | uuid.UUID
     name: str
     url: HttpUrl
-    alias: str
+    alias: Optional[str] = None
     active: bool = True
     api_key: Optional[str] = None
     cookie: Optional[str] = None

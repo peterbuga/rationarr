@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
 from app.api.indexer import router as indexer_router
 from app.api.job import router as job_router
