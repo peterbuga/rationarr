@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, Line, LineChart, XAxis } from "recharts"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import {
@@ -11,6 +11,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card"
 import {
   ChartConfig,
@@ -60,6 +61,180 @@ const fetcher = async (url: string) => {
   const res = await fetch(url);
   return res.json();
 };
+
+export function ChartLineMultiple(props: any) {
+  const { data, isLoading, error } = useSWR(`/api/scraper/${props.indexer.id}`, fetcher, {
+    refreshWhenOffline: false,
+    revalidateOnFocus: false,
+  });
+
+  const isMobile = useIsMobile()
+  const [timeRange, setTimeRange] = React.useState("90d")
+  const [filteredData, setFilteredData] = React.useState<object[]>([]);
+
+  React.useEffect(() => {
+    if (isMobile) {
+      setTimeRange("7d")
+    }
+
+    if (!isLoading) {
+      let chartData: any[] = [];
+
+      for (const [key, entries] of Object.entries(data as Record<string, unknown>)) {
+        for (const [dt, value] of Object.entries(entries as Record<string, unknown>)) {
+          const foundDate = chartData.find((item: any) => item.date === dt);
+          if (!foundDate) {
+            chartData.push({
+              "date": dt, 
+              [key+"Orig"]: value, 
+              [key]: value as number ? Math.log10(value as number) : 0
+            })
+          } else {
+            chartData = chartData.map(item =>
+              item.date === dt ? {
+                ...item, 
+                [key+"Orig"]: value, 
+                [key]: value as number ? Math.log10(value as number) : 0
+              } : item
+            );
+          }
+        }
+      }
+
+      const filteredData = chartData.filter((item) => {
+        const date = new Date(item.date)
+        const referenceDate = new Date()
+        let daysToSubtract = 90
+        if (timeRange === "30d") {
+          daysToSubtract = 30
+        } else if (timeRange === "7d") {
+          daysToSubtract = 7
+        }
+        const startDate = new Date(referenceDate)
+        startDate.setDate(startDate.getDate() - daysToSubtract)
+        return date >= startDate
+      })
+
+      setFilteredData(filteredData);
+    }
+  }, [isMobile, data, isLoading, timeRange])
+
+  return (
+    <Card className="@container/card">
+      <CardHeader>
+        <CardTitle><span className="font-bold">{props.indexer.name}</span> stats</CardTitle>
+        {/* <CardDescription>January - June 2024</CardDescription> */}
+        <CardAction>
+          <ToggleGroup
+            type="single"
+            value={timeRange}
+            onValueChange={setTimeRange}
+            variant="outline"
+            className="hidden *:data-[slot=toggle-group-item]:!px-4 @[767px]/card:flex"
+          >
+            <ToggleGroupItem value="90d">Last 3 months</ToggleGroupItem>
+            <ToggleGroupItem value="30d">Last 30 days</ToggleGroupItem>
+            <ToggleGroupItem value="7d">Last 7 days</ToggleGroupItem>
+          </ToggleGroup>
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger
+              className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
+              size="sm"
+              aria-label="Select a value"
+            >
+              <SelectValue placeholder="Last 3 months" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              <SelectItem value="90d" className="rounded-lg">
+                Last 3 months
+              </SelectItem>
+              <SelectItem value="30d" className="rounded-lg">
+                Last 30 days
+              </SelectItem>
+              <SelectItem value="7d" className="rounded-lg">
+                Last 7 days
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig}>
+          <LineChart
+            accessibilityLayer
+            data={filteredData}
+            margin={{
+              left: 12,
+              right: 12,
+            }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="date"
+              tickLine={true}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => {
+                const date = new Date(value)
+                return date.toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  hour: "numeric"
+                })
+              }}
+            />
+            <ChartTooltip 
+              cursor={true} 
+              content={
+                <ChartTooltipContent 
+                  labelFormatter={(value) => {
+                    return new Date(value).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })
+                  }}
+                  indicator="line"
+                  formatter={(value, name, props, item, index) => {
+                    // console.log(value, name, props, chartConfig[name])
+                    return [chartConfig[name as keyof typeof chartConfig].label,' => ', props.payload[name+"Orig"]]
+                  }} 
+                />
+              }
+            />
+            <Line
+              dataKey="points"
+              type="monotone"
+              stroke="var(--color-points)"
+              strokeWidth={2}
+              dot={true}
+            />
+            <Line
+              dataKey="ratio"
+              type="monotone"
+              stroke="var(--color-ratio)"
+              strokeWidth={2}
+              dot={true}
+            />
+            <Line
+              dataKey="seed"
+              type="monotone"
+              stroke="var(--color-seed)"
+              strokeWidth={2}
+              dot={true}
+            />
+            <Line
+              dataKey="leech"
+              type="monotone"
+              stroke="var(--color-leech)"
+              strokeWidth={2}
+              dot={true}
+            />
+          </LineChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  )
+}
 
 export function ChartAreaInteractive(props: any) {
   const { data, isLoading, error } = useSWR(`/api/scraper/${props.indexer.id}`, fetcher, {
@@ -222,18 +397,19 @@ export function ChartAreaInteractive(props: any) {
                 />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={true} />
             <XAxis
               dataKey="date"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              minTickGap={32}
+              minTickGap={16}
               tickFormatter={(value) => {
                 const date = new Date(value)
                 return date.toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
+                  hour: "numeric"
                 })
               }}
             />
@@ -248,6 +424,12 @@ export function ChartAreaInteractive(props: any) {
                     })
                   }}
                   indicator="dot"
+                  formatter={(value, name, props) => {
+                    // console.log(value, name, props)
+                    // `Profit: ${props.payload.actualProfit}`,
+                    // 'Revenue'
+                    return [value, name]
+                  }}
                 />
               }
             />
