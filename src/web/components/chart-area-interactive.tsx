@@ -159,7 +159,7 @@ export function ChartLineMultiple(props: any) {
         </CardAction>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer className="max-h-80 w-full" config={chartConfig}>
           <LineChart
             accessibilityLayer
             data={filteredData}
