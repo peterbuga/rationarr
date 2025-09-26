@@ -15,29 +15,32 @@ from app.models._util import TimestampedModel
 
 class Scraper(Base):
     id = Column(Uuid, primary_key=True, index=True, default=uuid.uuid4)
-    tracker_id = Column(Uuid, ForeignKey("tracker.id"), index=True)
+    indexer_id = Column(Uuid, ForeignKey("indexer.id"), index=True)
     attribute = Column(String)
     value = Column(String)
-    created_at = Column(UtcDateTime, nullable=False, default=func.now(tz=timezone.utc))
-    updated_at = Column(UtcDateTime, nullable=False, default=func.now(tz=timezone.utc))
+    created_at = Column(
+        UtcDateTime, nullable=False, default=func.now(tz=timezone.utc)
+    )
+    updated_at = Column(
+        UtcDateTime, nullable=False, default=func.now(tz=timezone.utc)
+    )
 
 
 class ScraperInputModel(BaseModel):
-    tracker_id: uuid.UUID
+    indexer_id: uuid.UUID
     attribute: str
     value: str
 
 
 class ScraperOutputModel(TimestampedModel):
-    tracker_id: uuid.UUID
+    indexer_id: uuid.UUID
     attribute: str
     value: str
-    created_at: datetime
 
 
 class ScraperDataOutputModel(BaseModel):
-    ratio: Dict[datetime, float]
-    seed: Dict[datetime, int]
-    leech: Dict[datetime, int]
-    hnr: Dict[datetime, int]
+    ratio: Dict[datetime, float] = dict()
+    seed: Dict[datetime, int] = dict()
+    leech: Dict[datetime, int] = dict()
+    hnr: Dict[datetime, int] = dict()
     # test: Optional[Dict[datetime, int]] = {}

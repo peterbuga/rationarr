@@ -6,7 +6,9 @@ from sqlalchemy.orm import sessionmaker
 
 from app.config import settings
 
-engine = create_async_engine(str(settings.DATABASE_URI), echo=False, future=True)
+engine = create_async_engine(
+    str(settings.DATABASE_URI), echo=False, future=True
+)
 AsyncSessionLocal = sessionmaker(
     bind=engine, class_=AsyncSession, expire_on_commit=False
 )

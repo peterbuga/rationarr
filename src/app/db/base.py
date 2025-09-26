@@ -4,8 +4,13 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import as_declarative
 
 
+class SerializerMixin:
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
 @as_declarative()
-class Base:
+class Base(SerializerMixin):
     id: Any
     __name__: str
 

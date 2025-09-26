@@ -1,39 +1,27 @@
+name: rationarr
 
 services:
-  rationarr-web:
-    image: node:22-slim
-    container_name: rationarr-web
-    hostname: rationarr-web
-    command: "/bin/bash -c 'test -d /app/node_modules || npm ci && npm run dev'"
-    working_dir: '/app'
-    ports:
-      - '5173:5173'
-    volumes:
-      - './:/app'
   rationarr-app:
     image: rationarr-app
-    build: .
     container_name: rationarr-app
+    hostname: rationarr-app
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URI: postgresql+asyncpg://postgres:postgres@rationarr-db:5432/rationarr
-      DEBUG: true
+      PROWLARR_HOST: "${PROWLARR_HOST:-rationarr-prwlr}"
+      PROWLARR_APIKEY: "${PROWLARR_APIKEY}" 
+      DATABASE_URI: "postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST:-rationarr-db}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-rationarr}"
     depends_on:
       - rationarr-db
-    volumes:
-      - ./src/app:/code/app
-      # - ./dist:/code/dist
-      - ./alembic:/code/alembic
-      - ./alembic.ini:/code/alembic.ini
 
   rationarr-db:
     image: postgres:17
     container_name: rationarr-db
+    hostname: rationarr-db
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=rationarr
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB:-rationarr}"
     ports:
       - "5432:5432"
     volumes:

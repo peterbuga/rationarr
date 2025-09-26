@@ -24,10 +24,10 @@ async def scraped_data(id: uuid.UUID, db: DbSessionDep):
                 aggregate_order_by(Scraper.value, Scraper.created_at),
             ).label("agg"),
         )
-        .where(Scraper.tracker_id == id)
+        .where(Scraper.indexer_id == id)
         .group_by(Scraper.attribute)
     )
-    logging.error(f"{stmt}")
+    # logging.error(f"{stmt}")
     result = await db.execute(stmt)
     # columns = result.keys()
     # for row in result:

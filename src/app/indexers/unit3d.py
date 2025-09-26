@@ -10,7 +10,7 @@ from app.schemas.unit3d import Unit3dScraperFields
 
 
 class Unit3d(BaseIndexer):
-    name = "Unit3d [generic]"
+    # name = "Unit3d [generic]"
     api_key = None
 
     def __init__(self, id: uuid.UUID, **kwargs):
@@ -30,8 +30,10 @@ class Unit3d(BaseIndexer):
                     scrapers.append(
                         Scraper(
                             **{
-                                "tracker_id": self.tracker_id,
-                                "attribute": getattr(Unit3dScraperFields, attribute),
+                                "indexer_id": self.indexer_id,
+                                "attribute": getattr(
+                                    Unit3dScraperFields, attribute
+                                ),
                                 "value": str(value),
                             }
                         )

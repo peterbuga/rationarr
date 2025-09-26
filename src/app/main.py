@@ -4,7 +4,6 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api import api_router
 from app.config import settings
-from app.dependencies import SchedulerSessionDep
 from app.scheduler import start_scheduler
 
 app = FastAPI(
@@ -12,6 +11,9 @@ app = FastAPI(
     description="API-only FastAPI app for scheduled data crawling from configured websites.",
     version="0.1.0",
     redirect_slashes=False,
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
 )
 
 app.include_router(api_router)
@@ -22,53 +24,82 @@ async def startup_event():
     await start_scheduler()
 
 
-def _debug_proxy():
-    import httpx
-    from starlette.background import BackgroundTask
-    from starlette.requests import Request
-    from starlette.responses import StreamingResponse
+@app.get("/api/health")
+async def get_health():
+    return Response(content="OK", media_type="text/html")
 
-    client = httpx.AsyncClient(base_url="http://rationarr-web:5173/")
-
-    async def _reverse_proxy(request: Request):
-        url = httpx.URL(path=request.url.path, query=request.url.query.encode("utf-8"))
-        rp_req = client.build_request(
-            request.method,
-            url,
-            headers=request.headers.raw,
-            content=request.stream(),
-        )
-        rp_resp = await client.send(rp_req, stream=True)
-        return StreamingResponse(
-            rp_resp.aiter_raw(),
-            status_code=rp_resp.status_code,
-            headers=rp_resp.headers,
-            background=BackgroundTask(rp_resp.aclose),
-        )
-
-    app.add_route("/{path:path}", _reverse_proxy, ["GET", "POST"])
 
 if settings.DEBUG:
-    _debug_proxy()
+
+    @app.get("/")
+    # @app.get("/api")
+    async def index_debug():
+        return {"message": "Rationarr API is running in debug mode."}
+
 else:
     # serve static files
     # app.mount("/", StaticFiles(directory="dist", html=True), name="dist")
-    app.mount("/assets", StaticFiles(directory="dist/assets"), name="assets")
 
     @app.get("/")
     async def index():
         return FileResponse("dist/index.html")
-        # return {"message": "Rationarr API is running."}
+
+    file_routes = ["_next", "static"]
+    for file_route in file_routes:
+        app.mount(
+            f"/{file_route}",
+            StaticFiles(directory=f"dist/{file_route}"),
+            name=file_route,
+        )
+
+    path_routes = ["indexers"]
+    for path_route in path_routes:
+
+        @app.get(f"/{path_route}")
+        async def _():
+            return FileResponse(f"dist/{path_route}.html")
 
 
-@app.get("/health")
-async def root():
-    return Response(content="OK", media_type="text/html")
+# import os
+# from typing import Tuple
+
+# from fastapi import FastAPI
+# from fastapi.staticfiles import StaticFiles
+
+# app = FastAPI()
 
 
-# for testing
-@app.get("/api/jobs")
-async def get_jobs(scheduler: SchedulerSessionDep):
-    jobs = scheduler.get_jobs()
+# class SinglePageApplication(StaticFiles):
+#     """Acts similar to the bripkens/connect-history-api-fallback
+#     NPM package."""
 
-    return {"scheduled_jobs": [job.id for job in jobs]}
+#     def __init__(self, directory: os.PathLike, index='index.html') -> None:
+#         self.index = index
+
+#         # set html=True to resolve the index even when no
+#         # the base path is passed in
+#         super().__init__(directory=directory, packages=None, html=True, check_dir=True)
+
+#     async def lookup_path(self, path: str) -> Tuple[str, os.stat_result]:
+#         """Returns the index file when no match is found.
+
+#         Args:
+#             path (str): Resource path.
+
+#         Returns:
+#             [tuple[str, os.stat_result]]: Always retuens a full path and stat result.
+#         """
+#         full_path, stat_result = await super().lookup_path(path)
+
+#         # if a file cannot be found
+#         if stat_result is None:
+#             return await super().lookup_path(self.index)
+
+#         return (full_path, stat_result)
+
+
+# app.mount(
+#     path='/',
+#     app=SinglePageApplication(directory='path/to/dist'),
+#     name='SPA'
+# )

@@ -8,9 +8,9 @@ class BaseIndexer:
     name = None
     alias = None
 
-    def __init__(self, id: uuid.UUID, url: str = None, **kwargs):
-        self.tracker_id = id
-        self.url = (url or self.url).strip("/")
+    def __init__(self, id: uuid.UUID, url: str, **kwargs):
+        self.indexer_id = id
+        self.url = url.strip("/")
 
     async def extract_info(self, session: AsyncSession):
         pass
