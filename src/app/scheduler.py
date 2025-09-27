@@ -4,10 +4,10 @@ import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy import select
 
+from app.config import settings
 from app.db import AsyncSessionLocal
 from app.dependencies import get_scheduler
 from app.models.indexer import Indexer
-from app.config import settings
 
 
 async def scheduled_crawl(indexer: Indexer):

@@ -56,7 +56,9 @@ class Myanonamouse(BaseIndexer):
                 Scraper(
                     **{
                         "indexer_id": self.indexer_id,
-                        "attribute": getattr(MyanonamouseScraperFields, "points"),
+                        "attribute": getattr(
+                            MyanonamouseScraperFields, "points"
+                        ),
                         "value": points.text.lower()
                         .replace("bonus:", "")
                         .strip(),

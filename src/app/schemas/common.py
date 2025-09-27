@@ -14,7 +14,8 @@ class EnhancedStrEnum(StrEnum):
 # map scrapped fields to a fixed internal list of attributes
 # format: `scrapped-field` = "`internal-field`"
 class ScraperFields(EnhancedStrEnum):
-    # user = "user"
+    user = "user"
+    email = "email"
     user_class = "user_class"
     upload = "upload"
     download = "download"
@@ -29,3 +30,7 @@ class ScraperFields(EnhancedStrEnum):
     hnr = "hnr"
     invites = "invites"
     total_donate = "total_donate"
+    join_date = "join_date"
+    balance = "balance"
+    comments = "comments"  # torrent comments
+    posts = "posts"  # forum posts
