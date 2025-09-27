@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     PROWLARR_HOST: HttpUrl
     PROWLARR_APIKEY: str
+    INTERVAL_SCRAPE: int = 3600
 
 
 settings = Settings()

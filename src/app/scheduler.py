@@ -7,6 +7,7 @@ from sqlalchemy import select
 from app.db import AsyncSessionLocal
 from app.dependencies import get_scheduler
 from app.models.indexer import Indexer
+from app.config import settings
 
 
 async def scheduled_crawl(indexer: Indexer):
@@ -45,7 +46,7 @@ async def start_scheduler():
             scheduled_crawl,
             max_instances=1,
             trigger="interval",
-            seconds=1800,
+            seconds=settings.INTERVAL_SCRAPE,
             misfire_grace_time=30,
             kwargs={"indexer": indexer},
         )
