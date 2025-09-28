@@ -2,6 +2,7 @@
 
 import { AppSidebar } from "@/components/app-sidebar"
 import { ChartAreaInteractive, ChartLineMultiple } from "@/components/chart-area-interactive"
+// import { ChartLineDefault } from "@/components/chart-line-default";
 // import { DataTable } from "@/components/data-table"
 // import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/site-header"
@@ -43,6 +44,7 @@ export default function Page() {
               {data?.filter((item: any) => { return item.active}).map((indexer: any, i: number) => {
                 return (
                   <div className="px-4 lg:px-6" key={i}>
+                    {/* <ChartLineDefault /> */}
                     {/* <ChartAreaInteractive indexer={indexer}/> */}
                     <ChartLineMultiple indexer={indexer}/>
                   </div>

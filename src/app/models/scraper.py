@@ -36,6 +36,7 @@ class Scraper(Base):
             ScraperFields.upload.value,
             ScraperFields.download.value,
             ScraperFields.balance.value,
+            ScraperFields.buffer.value,
         ]:
             if bool(re.search(r"[^0-9]", value)):
                 size = bitmath.parse_string(value)

@@ -159,7 +159,7 @@ export function ChartLineMultiple(props: any) {
         </CardAction>
       </CardHeader>
       <CardContent>
-        <ChartContainer className="max-h-80 w-full" config={chartConfig}>
+        <ChartContainer className="w-full h-[400px] max-h-[400px] overflow-hidden" config={chartConfig}>
           <LineChart
             accessibilityLayer
             data={filteredData}
@@ -206,28 +206,28 @@ export function ChartLineMultiple(props: any) {
               type="monotone"
               stroke="var(--color-points)"
               strokeWidth={2}
-              dot={true}
+              dot={false}
             />
             <Line
               dataKey="ratio"
               type="monotone"
               stroke="var(--color-ratio)"
               strokeWidth={2}
-              dot={true}
+              dot={false}
             />
             <Line
               dataKey="seed"
               type="monotone"
               stroke="var(--color-seed)"
               strokeWidth={2}
-              dot={true}
+              dot={false}
             />
             <Line
               dataKey="leech"
               type="monotone"
               stroke="var(--color-leech)"
               strokeWidth={2}
-              dot={true}
+              dot={false}
             />
           </LineChart>
         </ChartContainer>
