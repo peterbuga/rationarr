@@ -1,3 +1,6 @@
+import os
+import logging
+
 from fastapi import FastAPI, Response
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -18,10 +21,31 @@ app = FastAPI(
 
 app.include_router(api_router)
 
+# @TODO move scheduler externally
+# quirk to run in only 1 uvicorn worker and not execute multiple same-jobs
+def is_primary_worker() -> bool:
+    pid = os.getpid()
+    parent_pid = os.getppid()
+    children = []
+    
+    for entry in os.listdir("/proc"):
+        if entry.isdigit():
+            try:
+                with open(f"/proc/{entry}/stat") as f:
+                    data = f.read().split()
+                    ppid = int(data[3])
+                    if ppid == parent_pid:
+                        children.append(int(entry))
+            except Exception:
+                continue
+
+    return pid == max(children)
+
 
 @app.on_event("startup")
 async def startup_event():
-    await start_scheduler()
+    if is_primary_worker():
+        await start_scheduler()
 
 
 @app.get("/api/health")

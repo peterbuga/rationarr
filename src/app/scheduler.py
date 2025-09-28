@@ -1,7 +1,7 @@
 import importlib
 import logging
+from slugify import slugify
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy import select
 
 from app.config import settings
@@ -39,9 +39,7 @@ async def start_scheduler():
 
     scheduler = get_scheduler()
     for indexer in indexers:
-        # if tracker.alias != 'MAM':
-        #     continue
-        logging.info(f"Job interval added for {indexer.name}")
+        logging.warning(f"Job interval added for {indexer.name}")
         scheduler.add_job(
             scheduled_crawl,
             max_instances=1,
@@ -49,4 +47,7 @@ async def start_scheduler():
             seconds=settings.INTERVAL_SCRAPE,
             misfire_grace_time=30,
             kwargs={"indexer": indexer},
+            id=indexer.name,
+            name=slugify(indexer.name, separator="_"),
+            replace_existing=True,
         )
