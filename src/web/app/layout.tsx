@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Rationarr",
   description: "Keep track of indexers in one place.",
+  icons: {
+    icon: "static/favicon.ico",
+  },
 };
 
 export default function RootLayout({

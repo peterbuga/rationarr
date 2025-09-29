@@ -168,7 +168,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {/* <IconInnerShadowTop className="!size-5" />   */}
                 {/* <ModeToggle /> */}
                 <Image
-                  src="static/rationarr-logo.png"
+                  src="static/rationarr-logo.svg"
                   alt="rationarr logo"
                   width={30}
                   height={29}
