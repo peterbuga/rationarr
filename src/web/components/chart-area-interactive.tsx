@@ -220,6 +220,7 @@ export function ChartLineMultiple(props: any) {
             />
             {Object.entries(chartConfig).map(([attr, value]) => (
               <Line
+                key={attr}
                 dataKey={attr}
                 type="monotone"
                 stroke={`var(--color-${attr})`}
