@@ -1,6 +1,7 @@
 import logging
 import time
 import uuid
+import random
 
 import httpx
 from bs4 import BeautifulSoup
@@ -21,7 +22,7 @@ class Myanonamouse(BaseIndexer):
         super().__init__(id, **kwargs)
         self.cookie = kwargs["cookie"]
 
-    async def extract_info(self, session: AsyncSession):
+    async def extract_info(self):
         headers = {
             "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
         }
@@ -38,12 +39,12 @@ class Myanonamouse(BaseIndexer):
             if not mam_id:
                 raise Exception("No MAM cookie.")
 
-            await session.execute(
+            await self.db_session.execute(
                 update(Indexer)
                 .where(Indexer.id == self.indexer_id)
                 .values(cookie=mam_id)
             )
-            await session.commit()
+            await self.db_session.commit()
 
             scrapers = []
             homepage_bs = BeautifulSoup(response.text, "html.parser")
@@ -66,7 +67,7 @@ class Myanonamouse(BaseIndexer):
                 )
             )
 
-            time.sleep(10)
+            time.sleep(random.randint(2,10))
             response = await client.get(f"{self.url}{my_info['href']}")
             my_info_bs = BeautifulSoup(response.text, "html.parser")
             my_info = my_info_bs.find(
@@ -101,5 +102,5 @@ class Myanonamouse(BaseIndexer):
                 else:
                     logging.debug(f"Field not tracked: {attribute} = {value}")
 
-            session.add_all(scrapers)
-            await session.commit()
+            self.db_session.add_all(scrapers)
+            await self.db_session.commit()

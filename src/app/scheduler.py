@@ -1,16 +1,19 @@
 import importlib
 import logging
 from slugify import slugify
+import datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 from app.config import settings
 from app.db import AsyncSessionLocal
 from app.dependencies import get_scheduler
-from app.models.indexer import Indexer
+from app.models import Indexer, Scraper
+from app.indexers.base_indexer import BaseIndexer
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.interval import IntervalTrigger
 
-
-async def scheduled_crawl(indexer: Indexer):
+async def get_indexer_instance(indexer: Indexer) -> BaseIndexer:
     try:
         # TODO: check if module already loaded
         indexer_class = indexer.type.capitalize()
@@ -22,15 +25,71 @@ async def scheduled_crawl(indexer: Indexer):
         )
 
     async with AsyncSessionLocal() as session:
-        try:
-            await indexer_instance.extract_info(session)
-        except Exception as e:
-            logging.error(f"Failed to crawl {indexer.url}: {e}")
+        await indexer_instance.set_db_session(session)
+
+    return indexer_instance
+
+
+async def scheduled_crawl(indexer: Indexer):
+    indexer_instance = get_indexer_instance(indexer)
+
+    try:
+        await indexer_instance.extract_info()
+    except Exception as e:
+        logging.error(f"Failed to crawl {indexer.url}: {e}")
+
+
+async def exchange_points():
+    logging.warning(f'test {datetime.datetime.now()}')
+    return
+    # Get the latest `points` entries for all the indexers
+    s = (
+        select(
+            Scraper.indexer_id,
+            Scraper.value,
+            Scraper.created_at,
+            func.row_number().over(
+                partition_by=Scraper.indexer_id,
+                order_by=Scraper.created_at.desc()
+            ).label("rn")
+        )
+        # TODO: add a period-limit to avoid stale entries
+        # or inactive indexers
+        .where(Scraper.attribute == "points")
+        .subquery()
+    ).alias('s')
+
+    stmt = (
+        select(
+            s.c.indexer_id,
+            Indexer.type,
+            s.c.value.label('points'),
+            s.c.created_at,
+        )
+        .join(Indexer, Indexer.id == s.c.indexer_id)
+        .where(s.c.rn == 1)
+    )
+
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(stmt)
+        indexer_points = result.mappings().all()
+
+        for indexer_point in indexer_points:
+            indexer = await session.get(Indexer, indexer_point.get('indexer_id'))
+            indexer_instance = get_indexer_instance(indexer)
+
+            # TODO: check if last exchange_points() was run before the latest `points` entry
+            # and/or trigger an extract_info() refresh after ran successfully (with some delay to allow website to update info)
+            # if total_points > target_points
+            # try:
+            #     await indexer_instance.exchange_points(total_points=indexer_point.get('points'), target_points=100)
+            # except Exception as e:
+            #     logging.error(f"Exchange points: {str(e)}")
 
 
 async def start_scheduler():
-    async with AsyncSessionLocal() as db:
-        result = await db.execute(
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
             select(Indexer)
             .where(Indexer.active.is_(True))
             .order_by(Indexer.created_at)
@@ -41,13 +100,25 @@ async def start_scheduler():
     for indexer in indexers:
         logging.warning(f"Job interval added for {indexer.name}")
         scheduler.add_job(
-            scheduled_crawl,
+            func=scheduled_crawl,
             max_instances=1,
-            trigger="interval",
-            seconds=settings.INTERVAL_SCRAPE,
+            trigger=IntervalTrigger(seconds=settings.INTERVAL_SCRAPE),  
             misfire_grace_time=30,
             kwargs={"indexer": indexer},
             id=indexer.name,
             name=slugify(indexer.name, separator="_"),
             replace_existing=True,
         )
+    
+    scheduler.add_job(
+        func=exchange_points,
+        max_instances=1,
+        trigger=CronTrigger(hour="*/3", minute=15, second=30),
+        # trigger=CronTrigger(second="*/5"),
+        # trigger=IntervalTrigger(seconds=30),
+        misfire_grace_time=30,
+        # kwargs={"indexer": indexer},
+        id="echange_points",
+        name="echange_points",
+        replace_existing=True,
+    )

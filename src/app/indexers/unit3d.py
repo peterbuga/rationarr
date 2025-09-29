@@ -17,7 +17,7 @@ class Unit3d(BaseIndexer):
         super().__init__(id, **kwargs)
         self.api_key = self.api_key or kwargs["api_key"]
 
-    async def extract_info(self, session: AsyncSession):
+    async def extract_info(self):
         async with httpx.AsyncClient() as client:
             endpoint_url = f"{self.url}/api/user?api_token={self.api_key}"
             response = await client.get(endpoint_url, timeout=10)
@@ -41,5 +41,5 @@ class Unit3d(BaseIndexer):
                 else:
                     logging.debug(f"Field not tracked: {attribute} = {value}")
 
-            session.add_all(scrapers)
-            await session.commit()
+            self.db_session.add_all(scrapers)
+            await self.db_session.commit()

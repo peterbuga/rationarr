@@ -1,17 +1,16 @@
 import logging
 import uuid
 
-from fastapi import APIRouter, Depends
-from sqlalchemy import func
+from fastapi import APIRouter
+from sqlalchemy import select, func
 from sqlalchemy.dialects.postgresql import aggregate_order_by
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies import DbSessionDep
-from app.models.scraper import Scraper, ScraperDataOutputModel
+from app.models import Indexer, Scraper
+from app.models.scraper import ScraperDataOutputModel
 
 router = APIRouter()
 
-from sqlalchemy import select
 
 
 @router.get("/{id}", response_model=ScraperDataOutputModel)

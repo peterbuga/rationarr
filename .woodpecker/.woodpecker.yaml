@@ -25,6 +25,8 @@ steps:
         from_secret: "REGISTRY_PASSWORD"
   - name: "docker-ls"
     image: "docker:cli"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
     commands:
       - "docker image ls"
 
