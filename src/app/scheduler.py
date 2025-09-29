@@ -1,17 +1,18 @@
+import datetime
 import importlib
 import logging
-from slugify import slugify
-import datetime
 
-from sqlalchemy import select, func
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.interval import IntervalTrigger
+from slugify import slugify
+from sqlalchemy import func, select
 
 from app.config import settings
 from app.db import AsyncSessionLocal
 from app.dependencies import get_scheduler
-from app.models import Indexer, Scraper
 from app.indexers.base_indexer import BaseIndexer
-from apscheduler.triggers.cron import CronTrigger
-from apscheduler.triggers.interval import IntervalTrigger
+from app.models import Indexer, Scraper
+
 
 async def get_indexer_instance(indexer: Indexer) -> BaseIndexer:
     try:
@@ -40,7 +41,7 @@ async def scheduled_crawl(indexer: Indexer):
 
 
 async def exchange_points():
-    logging.warning(f'test {datetime.datetime.now()}')
+    logging.warning(f"test {datetime.datetime.now()}")
     return
     # Get the latest `points` entries for all the indexers
     s = (
@@ -48,22 +49,23 @@ async def exchange_points():
             Scraper.indexer_id,
             Scraper.value,
             Scraper.created_at,
-            func.row_number().over(
+            func.row_number()
+            .over(
                 partition_by=Scraper.indexer_id,
-                order_by=Scraper.created_at.desc()
-            ).label("rn")
+                order_by=Scraper.created_at.desc(),
+            )
+            .label("rn"),
         )
         # TODO: add a period-limit to avoid stale entries
         # or inactive indexers
-        .where(Scraper.attribute == "points")
-        .subquery()
-    ).alias('s')
+        .where(Scraper.attribute == "points").subquery()
+    ).alias("s")
 
     stmt = (
         select(
             s.c.indexer_id,
             Indexer.type,
-            s.c.value.label('points'),
+            s.c.value.label("points"),
             s.c.created_at,
         )
         .join(Indexer, Indexer.id == s.c.indexer_id)
@@ -75,7 +77,9 @@ async def exchange_points():
         indexer_points = result.mappings().all()
 
         for indexer_point in indexer_points:
-            indexer = await session.get(Indexer, indexer_point.get('indexer_id'))
+            indexer = await session.get(
+                Indexer, indexer_point.get("indexer_id")
+            )
             indexer_instance = get_indexer_instance(indexer)
 
             # TODO: check if last exchange_points() was run before the latest `points` entry
@@ -102,14 +106,14 @@ async def start_scheduler():
         scheduler.add_job(
             func=scheduled_crawl,
             max_instances=1,
-            trigger=IntervalTrigger(seconds=settings.INTERVAL_SCRAPE),  
+            trigger=IntervalTrigger(seconds=settings.INTERVAL_SCRAPE),
             misfire_grace_time=30,
             kwargs={"indexer": indexer},
             id=indexer.name,
             name=slugify(indexer.name, separator="_"),
             replace_existing=True,
         )
-    
+
     scheduler.add_job(
         func=exchange_points,
         max_instances=1,

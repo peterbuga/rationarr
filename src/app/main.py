@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 
 from fastapi import FastAPI, Response
 from fastapi.responses import FileResponse
@@ -21,13 +21,14 @@ app = FastAPI(
 
 app.include_router(api_router)
 
+
 # @TODO move scheduler externally
 # quirk to run in only 1 uvicorn worker and not execute multiple same-jobs
 def is_primary_worker() -> bool:
     pid = os.getpid()
     parent_pid = os.getppid()
     children = []
-    
+
     for entry in os.listdir("/proc"):
         if entry.isdigit():
             try:

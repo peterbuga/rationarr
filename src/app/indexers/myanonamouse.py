@@ -1,7 +1,7 @@
 import logging
+import random
 import time
 import uuid
-import random
 
 import httpx
 from bs4 import BeautifulSoup
@@ -67,7 +67,7 @@ class Myanonamouse(BaseIndexer):
                 )
             )
 
-            time.sleep(random.randint(2,10))
+            time.sleep(random.randint(2, 10))
             response = await client.get(f"{self.url}{my_info['href']}")
             my_info_bs = BeautifulSoup(response.text, "html.parser")
             my_info = my_info_bs.find(

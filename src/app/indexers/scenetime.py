@@ -46,12 +46,14 @@ class Scenetime(BaseIndexer):
             path="global_API.php",
         )
 
-        self.headers.update({
-            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "X-Requested-With": "XMLHttpRequest",
-            "Origin": self.url,
-            "Referer": build_url(host=self.url, path="mybonus.php"),
-        })
+        self.headers.update(
+            {
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "X-Requested-With": "XMLHttpRequest",
+                "Origin": self.url,
+                "Referer": build_url(host=self.url, path="mybonus.php"),
+            }
+        )
 
         # async with httpx.AsyncClient(
         #     headers=self.headers, timeout=10, cookies=self.cookies
@@ -70,7 +72,6 @@ class Scenetime(BaseIndexer):
         #         .values(cookie=new_cookies)
         #     )
         #     await self.db_session.commit()
-
 
     async def extract_info(self):
         async with httpx.AsyncClient(

@@ -20,5 +20,7 @@ class BaseIndexer:
     async def extract_info(self) -> None:
         pass
 
-    async def exchange_points(self, total_points: float, target_points: int) -> None:
+    async def exchange_points(
+        self, total_points: float, target_points: int
+    ) -> None:
         pass

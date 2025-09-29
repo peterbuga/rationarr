@@ -12,6 +12,7 @@ api_router.include_router(job_router, prefix="/job", tags=[])
 
 try:
     from app.api.test import router as test_router
+
     api_router.include_router(test_router, prefix="/test", tags=[])
 except:
     pass

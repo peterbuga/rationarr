@@ -2,7 +2,7 @@ import logging
 import uuid
 
 from fastapi import APIRouter
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import aggregate_order_by
 
 from app.dependencies import DbSessionDep
@@ -10,7 +10,6 @@ from app.models import Indexer, Scraper
 from app.models.scraper import ScraperDataOutputModel
 
 router = APIRouter()
-
 
 
 @router.get("/{id}", response_model=ScraperDataOutputModel)
