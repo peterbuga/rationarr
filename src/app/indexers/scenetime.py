@@ -7,8 +7,7 @@ from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.indexers.base_indexer import BaseIndexer
-from app.models import Scraper
-from app.models.indexer import Indexer
+from app.models import Activity, Indexer, Scraper
 from app.schemas.scenetime import ScenetimeScraperFields
 from app.utils.cookie import cookie_str_to_dict, dict_to_cookie_str
 from app.utils.url import build_url
@@ -19,7 +18,7 @@ class Scenetime(BaseIndexer):
     points_map = {
         100: {"value": "1", "desc": "1 GB upload"},
         200: {"value": "2", "desc": "2.5 GB upload"},
-        350: {"value": "3", "desc": "5 GB upload"}, # not confirmed
+        350: {"value": "3", "desc": "5 GB upload"},  # not confirmed
         500: {"value": "4", "desc": "custom title"},  # not confirmed
         # 2000: "1 invite",
         # 3000: "50 GB upload",
@@ -55,23 +54,34 @@ class Scenetime(BaseIndexer):
             }
         )
 
-        # async with httpx.AsyncClient(
-        #     headers=self.headers, timeout=10, cookies=self.cookies
-        # ) as client:
-        #     post_data = {"opt": self.points_map[target_points]["value"], "type": "bpxch"}
-        #     response = await client.post(exchange_points_url, data=post_data)
-        #     response.raise_for_status()
+        async with httpx.AsyncClient(
+            headers=self.headers, timeout=10, cookies=self.cookies
+        ) as client:
+            post_data = {
+                "opt": self.points_map[target_points]["value"],
+                "type": "bpxch",
+            }
+            response = await client.post(exchange_points_url, data=post_data)
+            response.raise_for_status()
 
-        #     print(response.text)
-        #     logging.warning(response.text)
+            # TODO check for valid response
+            new_cookies = dict_to_cookie_str(dict(client.cookies))
 
-        #     new_cookies = dict_to_cookie_str(dict(client.cookies))
-        #     await self.db_session.execute(
-        #         update(Indexer)
-        #         .where(Indexer.id == self.indexer_id)
-        #         .values(cookie=new_cookies)
-        #     )
-        #     await self.db_session.commit()
+        await self.db_session.execute(
+            update(Indexer)
+            .where(Indexer.id == self.indexer_id)
+            .values(cookie=new_cookies)
+        )
+        await self.db_session.commit()
+
+        activity_data = Activity(
+            **{
+                "indexer_id": self.indexer_id,
+                "activity": f"{target_points} bonus points exchanged for {self.points_map[target_points]['desc']}.",
+            }
+        )
+        self.db_session.add(activity_data)
+        await self.db_session.commit()
 
     async def extract_info(self):
         async with httpx.AsyncClient(

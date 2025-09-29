@@ -32,7 +32,7 @@ async def get_indexer_instance(indexer: Indexer) -> BaseIndexer:
 
 
 async def scheduled_crawl(indexer: Indexer):
-    indexer_instance = get_indexer_instance(indexer)
+    indexer_instance = await get_indexer_instance(indexer)
 
     try:
         await indexer_instance.extract_info()
@@ -42,7 +42,7 @@ async def scheduled_crawl(indexer: Indexer):
 
 async def exchange_points():
     logging.warning(f"test {datetime.datetime.now()}")
-    return
+    # return
     # Get the latest `points` entries for all the indexers
     s = (
         select(
@@ -80,15 +80,26 @@ async def exchange_points():
             indexer = await session.get(
                 Indexer, indexer_point.get("indexer_id")
             )
-            indexer_instance = get_indexer_instance(indexer)
+            indexer_instance = await get_indexer_instance(indexer)
 
             # TODO: check if last exchange_points() was run before the latest `points` entry
             # and/or trigger an extract_info() refresh after ran successfully (with some delay to allow website to update info)
-            # if total_points > target_points
-            # try:
-            #     await indexer_instance.exchange_points(total_points=indexer_point.get('points'), target_points=100)
-            # except Exception as e:
-            #     logging.error(f"Exchange points: {str(e)}")
+            if (
+                indexer.exchange_points is not None
+                and float(indexer_point.points) > indexer.exchange_points
+            ):
+                logging.warning(
+                    f"Triggered `{indexer_point.type}` for total {indexer_point.points} points, "
+                    f"auth-exchange {indexer.exchange_points}"
+                )
+
+                try:
+                    await indexer_instance.exchange_points(
+                        total_points=float(indexer_point.get("points")),
+                        target_points=indexer.exchange_points,
+                    )
+                except Exception as e:
+                    logging.error(f"Exchange points: {str(e)}")
 
 
 async def start_scheduler():
@@ -118,7 +129,7 @@ async def start_scheduler():
         func=exchange_points,
         max_instances=1,
         trigger=CronTrigger(hour="*/3", minute=15, second=30),
-        # trigger=CronTrigger(second="*/5"),
+        # trigger=CronTrigger(second="*/10"),
         # trigger=IntervalTrigger(seconds=30),
         misfire_grace_time=30,
         # kwargs={"indexer": indexer},
