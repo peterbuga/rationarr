@@ -45,7 +45,7 @@ const chartConfig = {
   },
   leech: {
     label: "Leech",
-    color: "var(--primary)",
+    color: "orange",
   },
   hnr: {
     label: "HNR",
@@ -54,6 +54,14 @@ const chartConfig = {
   points: {
     label: "Points",
     color: "yellow",
+  },
+  download: {
+    label: "Download",
+    color: "#770023",
+  },
+  upload: {
+    label: "Upload",
+    color: "#01731F",
   },
 } satisfies ChartConfig
 
@@ -83,18 +91,27 @@ export function ChartLineMultiple(props: any) {
       for (const [key, entries] of Object.entries(data as Record<string, unknown>)) {
         for (const [dt, value] of Object.entries(entries as Record<string, unknown>)) {
           const foundDate = chartData.find((item: any) => item.date === dt);
+
+          // convert bytes to megabytes
+          let valueNew;
+          if (['download', 'upload', 'buffer'].includes(key)) {
+            valueNew = ((value as number) / 1024 / 1024).toFixed(2)
+          } else {
+            valueNew = value
+          }
+
           if (!foundDate) {
             chartData.push({
               "date": dt, 
-              [key+"Orig"]: value, 
-              [key]: value as number ? Math.log10(value as number) : 0
+              [key+"Orig"]: valueNew, 
+              [key]: valueNew as number ? Math.log10(valueNew as number) : 0
             })
           } else {
             chartData = chartData.map(item =>
               item.date === dt ? {
                 ...item, 
-                [key+"Orig"]: value, 
-                [key]: value as number ? Math.log10(value as number) : 0
+                [key+"Orig"]: valueNew, 
+                [key]: valueNew as number ? Math.log10(valueNew as number) : 0
               } : item
             );
           }
@@ -201,34 +218,15 @@ export function ChartLineMultiple(props: any) {
                 />
               }
             />
-            <Line
-              dataKey="points"
-              type="monotone"
-              stroke="var(--color-points)"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              dataKey="ratio"
-              type="monotone"
-              stroke="var(--color-ratio)"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              dataKey="seed"
-              type="monotone"
-              stroke="var(--color-seed)"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              dataKey="leech"
-              type="monotone"
-              stroke="var(--color-leech)"
-              strokeWidth={2}
-              dot={false}
-            />
+            {Object.entries(chartConfig).map(([attr, value]) => (
+              <Line
+                dataKey={attr}
+                type="monotone"
+                stroke={`var(--color-${attr})`}
+                strokeWidth={2}
+                dot={false}
+              />
+            ))}
           </LineChart>
         </ChartContainer>
       </CardContent>
