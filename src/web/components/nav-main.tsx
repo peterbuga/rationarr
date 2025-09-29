@@ -1,5 +1,6 @@
 "use client"
 
+import Link from 'next/link'
 import { IconCirclePlusFilled, IconMail, type Icon } from "@tabler/icons-react"
 
 import { Button } from "@/components/ui/button"
@@ -48,7 +49,7 @@ export function NavMain({
               <SidebarMenuButton tooltip={item.title}>
                 {item.icon && <item.icon />}
                 <span>
-                  <a href={item.url}>{item.title}</a>
+                  <Link href={item.url}>{item.title}</Link>
                 </span>
               </SidebarMenuButton>
             </SidebarMenuItem>

@@ -1,7 +1,12 @@
+from datetime import timezone
 from typing import Any
 
+from sqlalchemy import Column
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import as_declarative
+from sqlalchemy.sql import func
+
+from app.db.utc_date_time import UtcDateTime
 
 
 class SerializerMixin:
@@ -13,6 +18,13 @@ class SerializerMixin:
 class Base(SerializerMixin):
     id: Any
     __name__: str
+
+    created_at = Column(
+        UtcDateTime, nullable=False, default=func.now(tz=timezone.utc)
+    )
+    updated_at = Column(
+        UtcDateTime, nullable=False, default=func.now(tz=timezone.utc)
+    )
 
     # Generate __tablename__ automatically
     @declared_attr

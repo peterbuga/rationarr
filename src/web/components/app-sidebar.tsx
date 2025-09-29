@@ -55,20 +55,20 @@ const data = {
       icon: IconListDetails,
     },
     {
-      title: "Alerts",
-      url: "/alerts",
-      icon: IconNotification,
-    },
-    {
-      title: "Logs",
-      url: "/logs",
+      title: "Activities",
+      url: "/activities",
       icon: IconLogs,
     },
-        {
-      title: "Settings",
-      url: "/settings",
-      icon: IconSettings,
-    },
+    // {
+    //   title: "Alerts",
+    //   url: "/alerts",
+    //   icon: IconNotification,
+    // },
+    // {
+    //   title: "Settings",
+    //   url: "/settings",
+    //   icon: IconSettings,
+    // },
   ],
   navClouds: [
     {

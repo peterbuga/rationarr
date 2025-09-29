@@ -77,7 +77,7 @@ else:
             name=file_route,
         )
 
-    path_routes = ["indexers"]
+    path_routes = ["indexers", "activities"]
     for path_route in path_routes:
 
         @app.get(f"/{path_route}")

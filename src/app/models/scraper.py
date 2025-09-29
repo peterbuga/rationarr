@@ -1,18 +1,16 @@
 import re
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict
 
 import bitmath
 from pydantic import BaseModel
 from sqlalchemy import Column, ForeignKey, String, Uuid
 from sqlalchemy.orm import validates
-from sqlalchemy.sql import func
 
 from app.db.base import Base
 
 # from sqlalchemy import Boolean, Column, Float, Integer, String
-from app.db.utc_date_time import UtcDateTime
 from app.models._util import TimestampedModel
 from app.schemas.common import ScraperFields
 
@@ -22,12 +20,6 @@ class Scraper(Base):
     indexer_id = Column(Uuid, ForeignKey("indexer.id"), index=True)
     attribute = Column(String)
     value = Column(String)
-    created_at = Column(
-        UtcDateTime, nullable=False, default=func.now(tz=timezone.utc)
-    )
-    updated_at = Column(
-        UtcDateTime, nullable=False, default=func.now(tz=timezone.utc)
-    )
 
     @validates("value")
     def validate_value(self, key, value):
