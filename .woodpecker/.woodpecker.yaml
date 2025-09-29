@@ -29,4 +29,5 @@ steps:
       WEBHOOK_RECREATE_URL:
         from_secret: "WEBHOOK_RECREATE_URL"
     commands:
-      - "curl -v -X POST \"${WEBHOOK_RECREATE_URL}\""
+      - "env"
+      - "curl -v -X POST $WEBHOOK_RECREATE_URL"
