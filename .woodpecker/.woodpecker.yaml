@@ -24,9 +24,9 @@ steps:
       password:
         from_secret: "REGISTRY_PASSWORD"
   - name: "docker-ls"
-    image: "docker:cli"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
+    image: "alpine/curl"
+    environment:
+      WEBHOOK_RECREATE_URL:
+        from_secret: "WEBHOOK_RECREATE_URL"
     commands:
-      - "docker image ls"
-
+      - "curl -v -X POST \"${WEBHOOK_RECREATE_URL}\""

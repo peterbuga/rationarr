@@ -19,12 +19,12 @@ class Scenetime(BaseIndexer):
     points_map = {
         100: {"value": "1", "desc": "1 GB upload"},
         200: {"value": "2", "desc": "2.5 GB upload"},
-        350: "5 GB upload",
-        500: "custom title",
-        2000: "1 invite",
-        3000: "50 GB upload",
-        5800: "100 GB upload",
-        14000: "250 GB upload",
+        350: {"value": "3", "desc": "5 GB upload"}, # not confirmed
+        500: {"value": "4", "desc": "custom title"},  # not confirmed
+        # 2000: "1 invite",
+        # 3000: "50 GB upload",
+        # 5800: "100 GB upload",
+        # 14000: "250 GB upload",
     }
 
     def __init__(self, **kwargs):
