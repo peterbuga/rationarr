@@ -1,7 +1,7 @@
 import logging
 import os
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -77,13 +77,16 @@ else:
             name=file_route,
         )
 
-    path_routes = ["indexers", "activities"]
+    def create_endpoint(route_name: str):
+        async def endpoint(request: Request):
+            return FileResponse(f"dist/{route_name}{".html" if not os.path.splitext(route_name)[1] else "" }")
+        return endpoint
+
+    path_routes = ["index", "indexers", "activities"]
     for path_route in path_routes:
-
-        @app.get(f"/{path_route}")
-        async def _():
-            return FileResponse(f"dist/{path_route}.html")
-
+        app.add_api_route(f"/{path_route}", create_endpoint(path_route), methods=["GET", "POST"])
+        app.add_api_route(f"/{path_route}.txt", create_endpoint(f"{path_route}.txt"), methods=["GET"])
+        
 
 # import os
 # from typing import Tuple
