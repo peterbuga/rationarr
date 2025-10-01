@@ -7,12 +7,13 @@ import httpx
 from bs4 import BeautifulSoup
 from slugify import slugify
 from sqlalchemy import update
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.indexers.base_indexer import BaseIndexer
 from app.models import Scraper
 from app.models.indexer import Indexer
 from app.schemas.myanonamouse import MyanonamouseScraperFields
+from app.utils.cookie import dict_to_cookie_str
+from app.utils.url import build_url
 
 
 class Myanonamouse(BaseIndexer):
@@ -20,7 +21,6 @@ class Myanonamouse(BaseIndexer):
 
     def __init__(self, id: uuid.UUID, **kwargs):
         super().__init__(id, **kwargs)
-        self.cookie = kwargs["cookie"]
 
     async def extract_info(self):
         headers = {
@@ -31,18 +31,25 @@ class Myanonamouse(BaseIndexer):
         cookie = {"mam_id": self.cookie}
 
         async with httpx.AsyncClient(
-            headers=headers, cookies=cookie, timeout=10
+            headers=headers, cookies=self.cookie, timeout=15
         ) as client:
-            response = await client.get(f"{self.url}/index.php")
+            homepage_url = build_url(host=self.url, path="index.php")
+            response = await client.get(homepage_url)
             response.raise_for_status()
+
             mam_id = response.cookies.get("mam_id")
             if not mam_id:
                 raise Exception("No MAM cookie.")
 
+            # save latest cookies
             await self.db_session.execute(
                 update(Indexer)
                 .where(Indexer.id == self.indexer_id)
-                .values(cookie=mam_id)
+                .values(
+                    cookie=dict_to_cookie_str(
+                        response.cookies or client.cookies
+                    )
+                )
             )
             await self.db_session.commit()
 
@@ -53,22 +60,34 @@ class Myanonamouse(BaseIndexer):
             )
 
             points = homepage_bs.find("a", {"href": "/store.php"})
-            scrapers.append(
-                Scraper(
-                    **{
-                        "indexer_id": self.indexer_id,
-                        "attribute": getattr(
-                            MyanonamouseScraperFields, "points"
-                        ),
-                        "value": points.text.lower()
-                        .replace("bonus:", "")
-                        .strip(),
-                    }
+            user = homepage_bs.find("a", {"id": "userMenu"})
+
+            connectable = homepage_bs.find("a", {"id": "tmCo"})
+            if connectable:
+                connectable = connectable.find("img")
+                connectable = "true" if "yes" in connectable["src"] else "false"
+
+            scrape_data = {
+                "points": points.text.lower().replace("bonus:", "").strip(),
+                "connectable": connectable,
+                "user": user.text.split(" ")[0].strip(),
+            }
+            for key, value in scrape_data.items():
+                scrapers.append(
+                    Scraper(
+                        **{
+                            "indexer_id": self.indexer_id,
+                            "attribute": getattr(
+                                MyanonamouseScraperFields, key
+                            ),
+                            "value": value,
+                        }
+                    )
                 )
-            )
 
             time.sleep(random.randint(2, 10))
-            response = await client.get(f"{self.url}{my_info['href']}")
+            my_info_url = build_url(host=self.url, path=my_info["href"])
+            response = await client.get(my_info_url)
             my_info_bs = BeautifulSoup(response.text, "html.parser")
             my_info = my_info_bs.find(
                 "table", {"style": "width:100%;min-width:100%;max-width:100%;"}
@@ -77,7 +96,6 @@ class Myanonamouse(BaseIndexer):
                 [i.text for i in tr.find_all("td")]
                 for tr in my_info.find_all("tr")
             ]
-            # logging.warning(f"tds {results}")
 
             for info in infos:
                 attribute, value = [i.strip() for i in info] + [None] * (

@@ -26,19 +26,27 @@ class Scraper(Base):
         # convert string-storage values into bytes
         if self.attribute in [
             ScraperFields.upload.value,
+            ScraperFields.real_upload.value,
             ScraperFields.download.value,
+            ScraperFields.real_download.value,
             ScraperFields.balance.value,
             ScraperFields.buffer.value,
         ]:
             if bool(re.search(r"[^0-9]", value)):
-                value = value.lower().replace("gb", "GiB").replace("kb", "KiB")
+                value = value.replace("GB", "GiB").replace("KB", "KiB")
                 size = bitmath.parse_string(value)
                 value = str(int(size.bytes))
 
         if self.attribute in [ScraperFields.points.value]:
             value = value.replace(",", "")
 
-        return value.strip()
+        if self.attribute in [ScraperFields.join_date.value]:
+            value = value.split("(")[0]
+
+        if self.attribute in [ScraperFields.comments.value]:
+            value = 0 if not value else value
+
+        return str(value).strip()
 
 
 class ScraperInputModel(BaseModel):

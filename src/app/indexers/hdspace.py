@@ -21,7 +21,6 @@ class Hdspace(BaseIndexer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.cookie = kwargs["cookie"]
         self.username = kwargs["username"]
         self.password = kwargs["password"]
 
@@ -112,7 +111,7 @@ class Hdspace(BaseIndexer):
                 .values(cookie=cookies_str)
             )
             await self.db_session.commit()
-            
+
             # collect data
             upload = (
                 logged_page_bs.find("td", {"class": "green", "align": "center"})
@@ -214,6 +213,7 @@ class Hdspace(BaseIndexer):
                 "join_date": join_date,
                 "posts": posts,
                 "freeleech": freeleech,
+                "last_access": last_access,
             }
 
             # save data

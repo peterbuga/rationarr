@@ -2,6 +2,8 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.utils.cookie import cookie_str_to_dict
+
 
 class BaseIndexer:
     url = None
@@ -13,6 +15,9 @@ class BaseIndexer:
         self.indexer_id = id
         self.url = url.strip("/")
         self.db_session = None
+        self.cookie = (
+            cookie_str_to_dict(kwargs["cookie"]) if kwargs["cookie"] else None
+        )
         self.name = kwargs["name"]
         self.type = kwargs["type"]
 

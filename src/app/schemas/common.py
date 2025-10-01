@@ -33,5 +33,7 @@ class ScraperFields(EnhancedStrEnum):
     join_date = "join_date"
     balance = "balance"
     freeleech = "freeleech"
+    last_access = "last_access"
+    connectable = "connectable"
     comments = "comments"  # torrent comments
     posts = "posts"  # forum posts
