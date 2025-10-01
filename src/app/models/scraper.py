@@ -31,8 +31,12 @@ class Scraper(Base):
             ScraperFields.buffer.value,
         ]:
             if bool(re.search(r"[^0-9]", value)):
+                value = value.lower().replace("gb", "GiB").replace("kb", "KiB")
                 size = bitmath.parse_string(value)
                 value = str(int(size.bytes))
+
+        if self.attribute in [ScraperFields.points.value]:
+            value = value.replace(",", "")
 
         return value.strip()
 

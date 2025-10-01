@@ -32,5 +32,6 @@ class ScraperFields(EnhancedStrEnum):
     total_donate = "total_donate"
     join_date = "join_date"
     balance = "balance"
+    freeleech = "freeleech"
     comments = "comments"  # torrent comments
     posts = "posts"  # forum posts

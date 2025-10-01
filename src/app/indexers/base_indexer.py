@@ -13,6 +13,8 @@ class BaseIndexer:
         self.indexer_id = id
         self.url = url.strip("/")
         self.db_session = None
+        self.name = kwargs["name"]
+        self.type = kwargs["type"]
 
     async def set_db_session(self, session: AsyncSession):
         self.db_session = session

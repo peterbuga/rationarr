@@ -11,6 +11,14 @@ RUN npm install && npm run build
 
 FROM python:3.12-alpine
 
+ENV LANGUAGE=C.UTF-8 \
+	LANG=C.UTF-8 \
+	LC_ALL=C.UTF-8 \
+    LC_CTYPE=C.UTF-8 \
+    LC_MESSAGES=C.UTF-8 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/code
+
 RUN apk add --no-cache gcc musl libffi postgresql tzdata
 RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
 
