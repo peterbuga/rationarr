@@ -16,7 +16,6 @@ license = {text = "MIT"}
 requires-python = ">=3.12"
 dependencies = [
     "fastapi == 0.115.14",
-    # uvicorn[standard]
     "uvicorn == 0.34.3",
     "pydantic==2.11.7",
     "pydantic-settings==2.10.1",
@@ -38,7 +37,6 @@ dependencies = [
 all = []
 
 dev = [
-#   "uvicorn[standard] == 0.32.0",
 #   "pre-commit == 4.0.1",
   "pip-tools == 7.4.1",
   "isort == 5.13.2",

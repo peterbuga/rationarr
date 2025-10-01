@@ -19,7 +19,8 @@ ENV LANGUAGE=C.UTF-8 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/code
 
-RUN apk add --no-cache gcc musl libffi postgresql tzdata
+# gcc libffi postgresql
+RUN apk add --no-cache musl tzdata
 RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
 
 WORKDIR /code
