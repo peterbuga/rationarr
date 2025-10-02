@@ -218,16 +218,18 @@ export function ChartLineMultiple(props: any) {
                 />
               }
             />
-            {Object.entries(chartConfig).map(([attr, value]) => (
-              <Line
-                key={attr}
-                dataKey={attr}
-                type="monotone"
-                stroke={`var(--color-${attr})`}
-                strokeWidth={2}
-                dot={false}
-              />
-            ))}
+            {Object.entries(chartConfig).map(([attr, value]) => {
+              if (Object.keys(value).length) {
+                return <Line
+                  key={attr}
+                  dataKey={attr}
+                  type="monotone"
+                  stroke={`var(--color-${attr})`}
+                  strokeWidth={2}
+                  dot={false}
+                />
+              }
+            })}
           </LineChart>
         </ChartContainer>
       </CardContent>
