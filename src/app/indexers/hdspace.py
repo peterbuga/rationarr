@@ -219,16 +219,15 @@ class Hdspace(BaseIndexer):
             # save data
             scrapers = []
             for attribute, value in scraped_data.items():
-                if value:
-                    scrapers.append(
-                        Scraper(
-                            **{
-                                "indexer_id": self.indexer_id,
-                                "attribute": getattr(ScraperFields, attribute),
-                                "value": str(value),
-                            }
-                        )
+                scrapers.append(
+                    Scraper(
+                        **{
+                            "indexer_id": self.indexer_id,
+                            "attribute": getattr(ScraperFields, attribute),
+                            "value": str(value),
+                        }
                     )
+                )
 
             self.db_session.add_all(scrapers)
             await self.db_session.commit()
