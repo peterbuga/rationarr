@@ -11,7 +11,9 @@ RUN npm install && npm run build
 
 FROM python:3.12-alpine
 
-ENV LANGUAGE=C.UTF-8 \
+ENV HOMEDIR=/code \
+    APP_USER=rationarr \
+    LANGUAGE=C.UTF-8 \
 	LANG=C.UTF-8 \
 	LC_ALL=C.UTF-8 \
     LC_CTYPE=C.UTF-8 \
@@ -19,11 +21,14 @@ ENV LANGUAGE=C.UTF-8 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/code
 
-# gcc libffi postgresql
-RUN apk add --no-cache musl tzdata
+RUN groupadd -r ${APP_USER} && \
+    useradd -r -d ${HOMEDIR} -g ${APP_USER} ${APP_USER}
+
+# gcc libffi postgresql musl
+RUN apk add --no-cache tzdata curl
 RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
 
-WORKDIR /code
+WORKDIR $HOMEDIR
 
 COPY pyproject.toml README.md ./
 RUN pip install --no-cache-dir -e .
@@ -41,5 +46,6 @@ uvicorn app.main:app --host 0.0.0.0 --proxy-headers --port 8000 --workers 4
 EOT
 RUN chmod +x /entrypoint.sh
 
+USER ${APP_USER}
 EXPOSE 8000
 ENTRYPOINT ["/entrypoint.sh"]

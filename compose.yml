@@ -5,6 +5,13 @@ services:
     image: rationarr-app
     container_name: rationarr-app
     hostname: rationarr-app
+    healthcheck:
+      test: "curl -sf http://localhost:8000/api/health || exit 1"
+      interval: "120s"
+      retries: 5
+      timeout: "10s"
+      start_period: "60s"
+      start_interval: "60s"
     ports:
       - "8000:8000"
     environment:

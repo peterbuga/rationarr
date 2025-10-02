@@ -1,5 +1,6 @@
-from pydantic import HttpUrl, PostgresDsn
 from typing import Optional
+
+from pydantic import HttpUrl, PostgresDsn
 from pydantic_settings import BaseSettings
 
 
@@ -8,7 +9,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     PROWLARR_HOST: HttpUrl
     PROWLARR_APIKEY: str
-    FLARESOULVERR_URL: Optional[str] = None
+    FLARESOULVERR_URL: Optional[HttpUrl] = None
     INTERVAL_SCRAPE: int = 3600
 
 

@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.activity import router as activity_router
+from app.api.health import router as health_router
 from app.api.indexer import router as indexer_router
 from app.api.job import router as job_router
 from app.api.scraper import router as scraper_router
@@ -11,6 +12,7 @@ api_router.include_router(indexer_router, prefix="/indexer", tags=[])
 api_router.include_router(scraper_router, prefix="/scraper", tags=[])
 api_router.include_router(activity_router, prefix="/activity", tags=[])
 api_router.include_router(job_router, prefix="/job", tags=[])
+api_router.include_router(health_router, prefix="/health", tags=[])
 
 try:
     from app.api.test import router as test_router

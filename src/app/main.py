@@ -1,7 +1,7 @@
 import logging
 import os
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -47,11 +47,6 @@ def is_primary_worker() -> bool:
 async def startup_event():
     if is_primary_worker():
         await start_scheduler()
-
-
-@app.get("/api/health")
-async def get_health():
-    return Response(content="OK", media_type="text/html")
 
 
 if settings.DEBUG:
