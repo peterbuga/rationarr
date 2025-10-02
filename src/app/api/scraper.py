@@ -1,4 +1,4 @@
-import logging
+# import logging
 import uuid
 
 from fastapi import APIRouter
@@ -6,7 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import aggregate_order_by
 
 from app.dependencies import DbSessionDep
-from app.models import Indexer, Scraper
+from app.models import Scraper
 from app.models.scraper import ScraperDataOutputModel
 
 router = APIRouter()

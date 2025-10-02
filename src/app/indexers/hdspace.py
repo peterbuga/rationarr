@@ -21,8 +21,6 @@ class Hdspace(BaseIndexer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.username = kwargs["username"]
-        self.password = kwargs["password"]
 
     async def extract_info(self):
         async with httpx.AsyncClient(timeout=60) as client:

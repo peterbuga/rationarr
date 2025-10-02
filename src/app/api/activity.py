@@ -1,4 +1,4 @@
-import logging
+# import logging
 import uuid
 
 from fastapi import APIRouter

@@ -4,12 +4,11 @@ import httpx
 from bs4 import BeautifulSoup
 from slugify import slugify
 from sqlalchemy import update
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.indexers.base_indexer import BaseIndexer
 from app.models import Activity, Indexer, Scraper
 from app.schemas.scenetime import ScenetimeScraperFields
-from app.utils.cookie import cookie_str_to_dict, dict_to_cookie_str
+from app.utils.cookie import dict_to_cookie_str
 from app.utils.url import build_url
 
 
@@ -28,7 +27,6 @@ class Scenetime(BaseIndexer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.cookies = cookie_str_to_dict(kwargs["cookie"])
         self.headers = {
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.9",
@@ -55,7 +53,7 @@ class Scenetime(BaseIndexer):
         )
 
         async with httpx.AsyncClient(
-            headers=self.headers, timeout=10, cookies=self.cookies
+            headers=self.headers, timeout=10, cookies=self.cookie
         ) as client:
             post_data = {
                 "opt": self.points_map[target_points]["value"],
@@ -85,13 +83,13 @@ class Scenetime(BaseIndexer):
 
     async def extract_info(self):
         async with httpx.AsyncClient(
-            headers=self.headers, timeout=10, cookies=self.cookies
+            headers=self.headers, timeout=10, cookies=self.cookie
         ) as client:
             # get the user details page
             user_details_url = build_url(
                 host=self.url,
                 path="userdetails.php",
-                query={"id": self.cookies["uid"]},
+                query={"id": self.cookie["uid"]},
             )
             response = await client.get(user_details_url)
             response.raise_for_status()

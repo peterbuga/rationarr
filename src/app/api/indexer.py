@@ -9,7 +9,7 @@ from sqlalchemy import select
 
 from app.config import settings
 from app.dependencies import DbSessionDep
-from app.indexers import *
+from app.indexers import *  # noqa: F403
 from app.indexers import base_indexer
 from app.models.indexer import (
     Indexer,

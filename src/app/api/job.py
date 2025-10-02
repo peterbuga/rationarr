@@ -1,23 +1,17 @@
-import logging
-
-from fastapi import APIRouter
-
-# from app.dependencies import DbSessionDep
-from app.dependencies import SchedulerSessionDep
-from app.models.indexer import Indexer
-
-# from sqlalchemy.ext.asyncio import AsyncSession
-# from sqlalchemy import select
-
-
-router = APIRouter()
-
+# import logging
 from datetime import datetime, timedelta
 
 from apscheduler.job import Job
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
+from fastapi import APIRouter
+
+# from app.dependencies import DbSessionDep
+from app.dependencies import SchedulerSessionDep
+from app.models.indexer import Indexer
+
+router = APIRouter()
 
 
 def safe_serialize(obj):

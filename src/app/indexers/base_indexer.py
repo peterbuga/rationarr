@@ -20,6 +20,9 @@ class BaseIndexer:
         )
         self.name = kwargs["name"]
         self.type = kwargs["type"]
+        self.username = kwargs["username"]
+        self.password = kwargs["password"]
+        self.mfa_key = kwargs["mfa_key"]
 
     async def set_db_session(self, session: AsyncSession):
         self.db_session = session

@@ -1,4 +1,4 @@
-import logging
+# import logging
 import os
 
 from fastapi import FastAPI, Request
@@ -52,7 +52,6 @@ async def startup_event():
 if settings.DEBUG:
 
     @app.get("/")
-    # @app.get("/api")
     async def index_debug():
         return {"message": "Rationarr API is running in debug mode."}
 

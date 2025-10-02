@@ -18,7 +18,7 @@ try:
     from app.api.test import router as test_router
 
     api_router.include_router(test_router, prefix="/test", tags=[])
-except:
+except Exception:
     pass
 
 # api_router.include_router(zoc.router, prefix="/zoc", tags=[Tags.zoc])
