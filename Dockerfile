@@ -21,8 +21,7 @@ ENV HOMEDIR=/code \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/code
 
-RUN groupadd -r ${APP_USER} && \
-    useradd -r -d ${HOMEDIR} -g ${APP_USER} ${APP_USER}
+RUN adduser ${APP_USER} -d ${HOMEDIR} --gecos '' --disabled-password --uid 1000
 
 # gcc libffi postgresql musl
 RUN apk add --no-cache tzdata curl
