@@ -95,7 +95,7 @@ export function ChartLineMultiple(props: any) {
           // convert bytes to megabytes
           let valueNew;
           if (['download', 'upload', 'buffer'].includes(key)) {
-            valueNew = ((value as number) / 1024 / 1024).toFixed(2)
+            valueNew = (value as number !== 0) ? ((value as number) / 1024 / 1024).toFixed(2) : value
           } else {
             valueNew = value
           }
