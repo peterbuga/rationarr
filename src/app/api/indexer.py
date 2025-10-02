@@ -5,8 +5,6 @@ import sys
 # import logging
 import httpx
 from fastapi import APIRouter
-
-# from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.config import settings
@@ -19,19 +17,19 @@ from app.models.indexer import (
     IndexerListOutputModel,
     IndexerOutputModel,
 )
+from app.utils.url import build_url
 
 router = APIRouter()
 
 
-@router.get("/list", response_model=list[IndexerListOutputModel])
-async def list_indexers():
-    rationarr_indexers = {}
-
+async def get_prowlarr_indexers_list():
     def get_indexer_key(indexer_key):
         return re.sub(r"[\s\-\.]", "", indexer_key.lower())
 
     async with httpx.AsyncClient() as client:
-        prowlarr_indexers_url = f"{settings.PROWLARR_HOST}api/v1/indexer/schema"
+        prowlarr_indexers_url = build_url(
+            settings.PROWLARR_HOST, path="/api/v1/indexer/schema"
+        )
         response = await client.get(
             prowlarr_indexers_url,
             timeout=10,
@@ -45,7 +43,29 @@ async def list_indexers():
             if indexer["protocol"] == "torrent"
             and indexer["privacy"] == "private"
         }
+        prowlarr_indexer_keys = [
+            "indexerUrls",
+            "legacyUrls",
+            "definitionName",
+            "description",
+            "name",
+        ]
+        prowlarr_indexers = {
+            indexer_key: {key: indexer[key] for key in prowlarr_indexer_keys}
+            for indexer_key, indexer in prowlarr_indexers.items()
+        }
+        return prowlarr_indexers
 
+
+@router.get("/prowlarr")
+async def get_prowlarr_indexers():
+    return await get_prowlarr_indexers_list()
+
+
+@router.get("/list", response_model=list[IndexerListOutputModel])
+async def list_indexers():
+    rationarr_indexers = {}
+    prowlarr_indexers = await get_prowlarr_indexers_list()
     # TODO: clean the hackish
     for name_idx, (name_obj, obj) in enumerate(
         inspect.getmembers(sys.modules[__name__])
