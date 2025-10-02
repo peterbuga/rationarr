@@ -1,7 +1,7 @@
 'use client';
 
 import { AppSidebar } from "@/components/app-sidebar"
-import { ChartAreaInteractive, ChartLineMultiple } from "@/components/chart-area-interactive"
+import { ChartLineMultiple } from "@/components/chart-area-interactive"
 // import { DataTable } from "@/components/data-table"
 // import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/site-header"
@@ -36,13 +36,13 @@ export default function Page() {
         <SiteHeader title="Dashboard"/>
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+            <div className="pl-6 flex flex-row flex-wrap py-8 gap-0 md:py-6">
               {/* <SectionCards /> */}
               {/* @typescript-eslint/no-explicit-any */}
               
               {data?.filter((item: any) => { return item.active}).map((indexer: any, i: number) => {
                 return (
-                  <div className="px-4 lg:px-6" key={i}>
+                  <div className="pr-6 flex-shrink-0 w-full md:w-1/2 xl:w-1/3 pb-6" key={i}>
                     {/* <ChartLineDefault /> */}
                     {/* <ChartAreaInteractive indexer={indexer}/> */}
                     <ChartLineMultiple indexer={indexer}/>

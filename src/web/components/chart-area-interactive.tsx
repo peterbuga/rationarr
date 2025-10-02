@@ -118,21 +118,22 @@ export function ChartLineMultiple(props: any) {
         }
       }
 
-      const filteredData = chartData.filter((item) => {
-        const date = new Date(item.date)
-        const referenceDate = new Date()
-        let daysToSubtract = 90
-        if (timeRange === "30d") {
-          daysToSubtract = 30
-        } else if (timeRange === "7d") {
-          daysToSubtract = 7
-        }
-        const startDate = new Date(referenceDate)
-        startDate.setDate(startDate.getDate() - daysToSubtract)
-        return date >= startDate
-      })
+      // const filteredData = chartData.filter((item) => {
+      //   const date = new Date(item.date)
+      //   const referenceDate = new Date()
+      //   let daysToSubtract = 90
+      //   if (timeRange === "30d") {
+      //     daysToSubtract = 30
+      //   } else if (timeRange === "7d") {
+      //     daysToSubtract = 7
+      //   }
+      //   const startDate = new Date(referenceDate)
+      //   startDate.setDate(startDate.getDate() - daysToSubtract)
+      //   return date >= startDate
+      // })
 
-      setFilteredData(filteredData);
+      // setFilteredData(filteredData);
+      setFilteredData(chartData);
     }
   }, [isMobile, data, isLoading, timeRange])
 
@@ -142,7 +143,7 @@ export function ChartLineMultiple(props: any) {
         <CardTitle><span className="font-bold">{props.indexer.name}</span> stats</CardTitle>
         {/* <CardDescription>January - June 2024</CardDescription> */}
         <CardAction>
-          <ToggleGroup
+          {/* <ToggleGroup
             type="single"
             value={timeRange}
             onValueChange={setTimeRange}
@@ -152,8 +153,8 @@ export function ChartLineMultiple(props: any) {
             <ToggleGroupItem value="90d">Last 3 months</ToggleGroupItem>
             <ToggleGroupItem value="30d">Last 30 days</ToggleGroupItem>
             <ToggleGroupItem value="7d">Last 7 days</ToggleGroupItem>
-          </ToggleGroup>
-          <Select value={timeRange} onValueChange={setTimeRange}>
+          </ToggleGroup> */}
+          {/* <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger
               className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
               size="sm"
@@ -172,7 +173,7 @@ export function ChartLineMultiple(props: any) {
                 Last 7 days
               </SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
         </CardAction>
       </CardHeader>
       <CardContent>
