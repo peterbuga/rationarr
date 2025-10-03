@@ -1,0 +1,75 @@
+name: "rationarr"
+
+services:
+  rationarr-web:
+    image: node:22-slim
+    container_name: rationarr-web
+    hostname: rationarr-web
+    command: "/bin/bash -c 'test -d /app/node_modules || npm ci && npm run dev'"
+    working_dir: '/app'
+    # ports:
+    #   - '5173:5173'
+    volumes:
+      - './:/app'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.rationarrweb.loadbalancer.server.port=3000"
+      - "traefik.http.routers.rationarrweb.rule=Host(`localhost`)"
+      - "traefik.http.routers.rationarrweb.entrypoints=web"
+
+  rationarr-db:
+    ports: !override
+      - "9432:5432"
+
+  rationarr-app:
+    image: "rationarr"
+    build: .
+    entrypoint: ''
+    command: ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000", "--log-level", "info"]
+    ports: !reset
+    environment:
+      DEBUG: true
+    volumes:
+      - ./src/app:/code/app
+      - ./alembic:/code/alembic
+      - ./alembic.ini:/code/alembic.ini
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.rationarrapp.loadbalancer.server.port=8000"
+      - "traefik.http.routers.rationarrapp.rule=Host(`localhost`) && (PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`) || PathPrefix(`/openapi.json`))"
+      - "traefik.http.routers.rationarrapp.entrypoints=web"
+
+  rationarr-trfk:
+    image: traefik
+    container_name: rationarr-trfk
+    hostname: rationarr-trfk
+    ports:
+      - "8009:80"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  rationarr-prwlr:
+    image: "linuxserver/prowlarr"
+    container_name: "rationarr-prwlr"
+    hostname: "rationarr-prwlr"
+    restart: "unless-stopped"
+    environment:
+      PROWLARR__AUTH__APIKEY: "${PROWLARR_APIKEY}"
+    ports:
+      - "9696:9696"
+
+  rationarr-flrslvrr:
+    image: "flaresolverr/flaresolverr"
+    container_name: "rationarr-flr"
+    hostname: "rationarr-flr"
+    restart: "unless-stopped"
+    environment:
+      TZ: "UTC"
+      LANG: "en_US"
+    ports:
+      - "8191:8191"
