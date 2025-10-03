@@ -33,7 +33,9 @@ class Unit3d(BaseIndexer):
 
     async def exchange_points(self, total_points, target_points):
         if not self.points_map.get(target_points):
-            logging.warning(f"Indexer {self.name} has no points exchange mapping.")
+            logging.warning(
+                f"Indexer {self.name} has no points exchange mapping."
+            )
             return
 
         homepage_url = build_url(host=self.url)
