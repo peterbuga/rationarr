@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api import api_router
 from app.config import settings
+from app.logging import EndpointFilter
 from app.scheduler import start_scheduler
 
 app = FastAPI(
@@ -21,21 +22,9 @@ app = FastAPI(
 
 app.include_router(api_router)
 
-
-# disable successful health checks
-block_endpoints = ["/api/health"]
-
-
-class LogFilter(logging.Filter):
-    def filter(self, record):
-        if record.args and len(record.args) >= 4:
-            if record.args[2] in block_endpoints and record.args[4] == "200":
-                return False
-        return True
-
-
-uvicorn_logger = logging.getLogger("uvicorn.access")
-uvicorn_logger.addFilter(LogFilter())
+logging.getLogger("uvicorn.access").addFilter(
+    EndpointFilter(exclude_path="/api/health", exclude_method="GET", exclude_status=200)
+)
 
 
 # @TODO move scheduler externally
