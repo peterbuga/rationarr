@@ -1,11 +1,12 @@
 import inspect
 import re
 import sys
+import uuid
 
 # import logging
 import httpx
 from fastapi import APIRouter
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 from app.config import settings
 from app.dependencies import DbSessionDep
@@ -85,8 +86,9 @@ async def list_indexers():
                         **{
                             "id": name_idx,
                             "name": member_obj.name
-                            or prowlarr_indexers[indexer_key]["definitionName"],
+                            or prowlarr_indexers[indexer_key]["name"].replace('(API)','').strip(),
                             "alias": member_obj.alias or name_obj.upper(),
+                            "type": indexer_key,
                             "url": prowlarr_indexers[indexer_key][
                                 "indexerUrls"
                             ],
@@ -112,3 +114,12 @@ async def add_indexer(indexer: IndexerInputModel, db: DbSessionDep):
     await db.refresh(indexer_data)
     # print('ttt', indexer_data.__dict__, indexer_data.__mapper__)
     return indexer_data.__dict__
+
+@router.delete("/{id}", status_code=204)
+async def remove_event(id: uuid.UUID, db: DbSessionDep):
+    # result = await IndexerService.delete_events([event_id])
+    stmt = delete(Indexer).where(Indexer.id == id)
+    await db.execute(stmt)
+    await db.commit()
+
+    return None

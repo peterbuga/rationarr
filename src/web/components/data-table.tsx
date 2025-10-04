@@ -117,6 +117,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Switch } from "@/components/ui/switch"
 import useSWR from 'swr';
 
 const fetcher = async (url: string) => {
@@ -130,27 +131,86 @@ export function AddIndexer() {
     revalidateOnFocus: false,
   });
 
-  console.log(data);
+  const initFormData = {
+    name: '',
+    url: '',
+    api_key: null,
+    cookie: null,
+    type: '',
+    username: null,
+    password: null,
+    mfa_key: null,
+    active: true,
+    exchange_points: null,
+  }
 
   const [selectedIndexer, setSelectedIndexer] = useState<string | undefined>(undefined);
   const [indexerUrls, setIndexerUrls] = useState<string[]>([]);
   const [selectedUrl, setSelectedUrl] = useState<string | undefined>(undefined);
+  const [indexerName, setIndexerName] = useState<string>("");
+  const [indexerActive, setIndexerActive] = useState<boolean>(true);
+  const [isLoadingSave, setIsLoadingSave] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [formData, setFormData] = useState(initFormData);
 
-  // Whenever category changes, update the childOptions and reset selectedItem
+  const handleInputChange = (e: any) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  const handleSaveChanges = async () => {
+    setIsLoadingSave(true);
+
+    try {
+      const res = await fetch('/api/indexer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+      
+      const data = await res.json();
+      setOpenDialog(false);
+      
+      // Reset form
+      setFormData(initFormData);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoadingSave(false);
+    }
+  };
+
   useEffect(() => {
     if (selectedIndexer) {
-      // console.log(data, selectedIndexer);
       const indexer = data.find((indexer: any) => indexer.name === selectedIndexer);
       setIndexerUrls(indexer.url || []);
+      setIndexerName(selectedIndexer);
+      handleInputChange({target: {name: 'type', value: indexer.type}});
     } else {
       setIndexerUrls([]);
     }
-    // reset child select when parent changes
     setSelectedUrl(undefined);
   }, [selectedIndexer, data]);
 
+  useEffect(() => {
+    handleInputChange({target: {name: 'url', value: selectedUrl}});
+  }, [selectedUrl]);
+
+  useEffect(() => {
+    handleInputChange({target: {name: 'name', value: indexerName}});
+  }, [indexerName]);
+
+  useEffect(() => {
+    handleInputChange({target: {name: 'active', value: indexerActive}});
+  }, [indexerActive]);
+
   return (
-    <Dialog>
+    <Dialog open={openDialog} onOpenChange={setOpenDialog}>
       <form>
         <DialogTrigger asChild>
           <Button variant="outline" size="sm">
@@ -158,7 +218,7 @@ export function AddIndexer() {
             <span className="lg:inline">Add Indexer</span>
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[625px]">
           <DialogHeader>
             <DialogTitle>Add indexer</DialogTitle>
             <DialogDescription>
@@ -167,12 +227,13 @@ export function AddIndexer() {
           </DialogHeader>
           <div className="grid gap-4">
             <div className="grid gap-3">
-              <Label>Indexer</Label>
+              <Label>Indexer Type</Label>
               <Select
-                value={selectedIndexer}
+                // value={selectedIndexer}
                 onValueChange={(val) => {
                   setSelectedIndexer(val);
-                }}>
+                }}
+                >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select indexer"/>
                 </SelectTrigger>
@@ -186,8 +247,7 @@ export function AddIndexer() {
               </Select>
             </div>
             <div className="grid gap-3">
-              <Label htmlFor="address">Address</Label>
-              {/* <Input id="address" name="url"/> */}
+              <Label htmlFor="address">Indexer Address</Label>
               <Select
                 value={selectedUrl}
                 onValueChange={(val) => {
@@ -208,28 +268,47 @@ export function AddIndexer() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="flex">
+              <div className="flex flex-row grid gap-3 w-2/3">
+                <Label htmlFor="username">Indexer Name (Rationarr idenfifier)</Label>
+                <Input id="name" name="name" value={indexerName} onChange={(e) => setIndexerName(e.target.value)} />
+              </div>
+              <div className="flex flex-row justify-center grid gap-3 w-1/3">
+                <Label htmlFor="airplane-mode">Activate</Label>
+                <Switch id="active" checked={indexerActive} onCheckedChange={(e) => setIndexerActive(e)} />
+              </div>
+            </div>
             <div className="grid gap-3">
               <Label htmlFor="username">Username</Label>
-              <Input id="username" name="username" />
+              <Input id="username" name="username" onChange={handleInputChange} />
             </div>
             <div className="grid gap-3">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" />
+              <Input id="password" name="password" onChange={handleInputChange} />
             </div>
             <div className="grid gap-3">
-              <Label htmlFor="cookies">Cookies</Label>
-              <Input id="cookies" name="cookies" />
+              <Label htmlFor="cookie">API key</Label>
+              <Input id="api_key" name="api_key" onChange={handleInputChange}/>
             </div>
             <div className="grid gap-3">
-              <Label htmlFor="mfa">MFA</Label>
-              <Input id="mfa" name="mfa" />
+              <Label htmlFor="cookie">Cookies</Label>
+              <Input id="cookie" name="cookie" onChange={handleInputChange}/>
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="mfa">MFA/2FA Setup Code</Label>
+              <Input id="mfa_key" name="mfa_key" onChange={handleInputChange} />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="mfa">Exchange Points</Label>
+              <Input type="number" id="exchange_points" name="exchange_points" onChange={handleInputChange} />
             </div>
           </div>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit" onClick={handleSaveChanges}
+                disabled={isLoadingSave} >{isLoadingSave ? 'Saving...' : 'Save Changes'}</Button>
           </DialogFooter>
         </DialogContent>
       </form>
@@ -248,24 +327,42 @@ export const schema = z.object({
 })
 
 // Create a separate component for the drag handle
-function DragHandle({ id }: { id: number }) {
-  const { attributes, listeners } = useSortable({
-    id,
-  })
+// function DragHandle({ id }: { id: number }) {
+//   const { attributes, listeners } = useSortable({
+//     id,
+//   })
 
-  return (
-    <Button
-      {...attributes}
-      {...listeners}
-      variant="ghost"
-      size="icon"
-      className="text-muted-foreground size-7 hover:bg-transparent"
-    >
-      <IconGripVertical className="text-muted-foreground size-3" />
-      <span className="sr-only">Drag to reorder</span>
-    </Button>
-  )
-}
+//   return (
+//     <Button
+//       {...attributes}
+//       {...listeners}
+//       variant="ghost"
+//       size="icon"
+//       className="text-muted-foreground size-7 hover:bg-transparent"
+//     >
+//       <IconGripVertical className="text-muted-foreground size-3" />
+//       <span className="sr-only">Drag to reorder</span>
+//     </Button>
+//   )
+// }
+
+const handleIndexerDelete = async (id: string) => {
+  try {
+    const res = await fetch(`/api/indexer/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    const data = await res.text();
+    console.log('data delete', data)
+  } catch (error) {
+    console.error('delete', error);
+  } finally {
+    window.location.reload();
+  }
+};
 
 const columns: ColumnDef<z.infer<typeof schema>>[] = [
   {
@@ -304,8 +401,8 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => {
-      return <span className="font-bold">{row.original.name}</span>
-      // return <TableCellViewer item={row.original} />
+      // return <span className="font-bold">{row.original.name}</span>
+      return <TableCellViewer item={row.original} />
     },
     enableHiding: false,
   },
@@ -421,7 +518,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   {
     id: "actions",
     header: () => <div className="w-full text-right">Actions</div>,
-    cell: () => (
+    cell: ({row}) => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -438,7 +535,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
           {/* <DropdownMenuItem>Make a copy</DropdownMenuItem>
           <DropdownMenuItem>Favorite</DropdownMenuItem> */}
           <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Delete (not working)</DropdownMenuItem>
+          <DropdownMenuItem onSelect={(e) => handleIndexerDelete(row.id)} variant="destructive">Delete</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     ),

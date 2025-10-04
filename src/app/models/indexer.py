@@ -13,6 +13,7 @@ from app.models._util import TimestampedModel
 class IndexerListOutputModel(BaseModel):
     id: int
     name: str
+    type: str
     alias: Optional[str] = None
     url: Optional[list[HttpUrl]] = None
 
@@ -42,6 +43,7 @@ class IndexerInputModel(BaseModel):
     name: str
     url: HttpUrl
     type: str
+    active: Optional[bool] = True
     api_key: Optional[str] = None
     cookie: Optional[str] = None
     username: Optional[str] = None
