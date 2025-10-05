@@ -12,6 +12,7 @@ from app.db import AsyncSessionLocal
 from app.dependencies import get_scheduler
 from app.indexers.base_indexer import BaseIndexer
 from app.models import Indexer, Scraper
+from app.utils.flaresolverr import flarsolverr_destroy_session
 
 
 async def get_indexer_instance(indexer: Indexer) -> BaseIndexer:
@@ -38,6 +39,8 @@ async def scheduled_crawl(indexer: Indexer):
         await indexer_instance.extract_info()
     except Exception as e:
         logging.error(f"Failed to crawl {indexer.url}: {e}")
+
+    await flarsolverr_destroy_session(indexer.type)
 
 
 async def exchange_points():
@@ -100,6 +103,8 @@ async def exchange_points():
                     )
                 except Exception as e:
                     logging.error(f"Exchange points: {str(e)}")
+
+                await flarsolverr_destroy_session(indexer.type)
 
 
 async def start_scheduler():

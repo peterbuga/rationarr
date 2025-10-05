@@ -1,5 +1,6 @@
 import datetime
 import logging
+import random
 import time
 import urllib.parse
 
@@ -40,7 +41,7 @@ class Hdspace(BaseIndexer):
             )
 
             response = await client.post(
-                settings.FLARESOULVERR_URL,
+                url=str(settings.FLARESOULVERR_URL),
                 headers={"Content-Type": "application/json"},
                 json={
                     "cmd": "request.get",
@@ -70,11 +71,11 @@ class Hdspace(BaseIndexer):
             logged_in = logged_page_bs.find("div", {"id": "menu"})
 
             if flaresolverr_data["status"] != "ok" or not logged_in:
-                time.sleep(2)
+                time.sleep(random.randint(2, 10))
 
                 params = {"uid": self.username, "pwd": self.password}
                 response = await client.post(
-                    settings.FLARESOULVERR_URL,
+                    url=str(settings.FLARESOULVERR_URL),
                     headers={"Content-Type": "application/json"},
                     json={
                         "cmd": "request.post",
