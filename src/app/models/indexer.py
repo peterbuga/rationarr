@@ -61,6 +61,7 @@ class IndexerOutputModel(TimestampedModel):
     name: str
     url: HttpUrl
     alias: Optional[str] = None
+    type: str
     active: bool = True
     api_key: Optional[str] = None
     cookie: Optional[str] = None

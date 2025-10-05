@@ -157,7 +157,7 @@ export function AddIndexer() {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name.replace('_custom', '')]: value
     }));
   };
   
@@ -178,6 +178,9 @@ export function AddIndexer() {
       
       // Reset form
       setFormData(initFormData);
+
+      // TODO: fic this
+      window.location.reload();
     } catch (error) {
       console.log(error);
     } finally {
@@ -246,35 +249,43 @@ export function AddIndexer() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid gap-3">
-              <Label htmlFor="address">Indexer Address</Label>
-              <Select
-                value={selectedUrl}
-                onValueChange={(val) => {
-                  setSelectedUrl(val);
-                }}
-                disabled={!selectedIndexer}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={selectedIndexer ? "Select indexer url" : "Select indexer first"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Urls</SelectLabel>
-                    {indexerUrls.map((opt, i) => (
-                      <SelectItem key={i} value={opt}>{opt}</SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
+            {(!selectedIndexer || indexerUrls.length != 0) && 
+              <div className="grid gap-3">
+                <Label htmlFor="address">Indexer Address</Label>
+                <Select
+                  value={selectedUrl}
+                  onValueChange={(val) => {
+                    setSelectedUrl(val);
+                  }}
+                  disabled={!selectedIndexer}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={selectedIndexer ? "Select indexer url" : "Select indexer first"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Urls</SelectLabel>
+                      {indexerUrls.map((opt, i) => (
+                        <SelectItem key={i} value={opt}>{opt}</SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            } 
+            {(selectedIndexer && indexerUrls.length == 0) && 
+              <div className="grid gap-3">
+                <Label htmlFor="url_custom">Indexer Address</Label>
+                <Input id="url_custom" name="url_custom" placeholder={`Enter custom ${selectedIndexer} address`} onChange={handleInputChange} />
+              </div>
+            }
             <div className="flex">
               <div className="flex flex-row grid gap-3 w-2/3">
                 <Label htmlFor="username">Indexer Name (Rationarr idenfifier)</Label>
                 <Input id="name" name="name" value={indexerName} onChange={(e) => setIndexerName(e.target.value)} />
               </div>
               <div className="flex flex-row justify-center grid gap-3 w-1/3">
-                <Label htmlFor="airplane-mode">Activate</Label>
+                <Label htmlFor="active">Active</Label>
                 <Switch id="active" checked={indexerActive} onCheckedChange={(e) => setIndexerActive(e)} />
               </div>
             </div>
@@ -324,6 +335,8 @@ export const schema = z.object({
   target: z.string(),
   limit: z.string(),
   reviewer: z.string(),
+  exchange_points: z.int(),
+  type: z.string(),
 })
 
 // Create a separate component for the drag handle
@@ -402,7 +415,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     header: "Name",
     cell: ({ row }) => {
       // return <span className="font-bold">{row.original.name}</span>
-      return <TableCellViewer item={row.original} />
+      return <div className="w-32"><TableCellViewer item={row.original} /></div>
     },
     enableHiding: false,
   },
@@ -418,17 +431,35 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     ),
   },
   {
+    accessorKey: "exchange_points",
+    header: "Exchange Points",
+    cell: ({ row }) => {
+      return <span className="">{row.original.exchange_points}</span>
+    },
+    enableHiding: false,
+  },
+  {
+    accessorKey: "type",
+    header: "Indexer type",
+    cell: ({ row }) => {
+      return <span className="">{row.original.type}</span>
+    },
+    enableHiding: false,
+  },
+  {
     accessorKey: "active",
     header: "Active",
     cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.active ? (
-          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
-        ) : (
-          <IconLoader />
-        )}
-        {row.original.active}
-      </Badge>
+      <div className="w-5">
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          {row.original.active ? (
+            <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+          ) : (
+            <IconLoader />
+          )}
+          {row.original.active}
+        </Badge>
+      </div>
     ),
   },
   // {
@@ -956,7 +987,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
               <Separator />
             </>
           )}
-          {/* <form className="flex flex-col gap-4">
+          <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <Label htmlFor="name">Name</Label>
               <Input id="name" defaultValue={item.name} />
@@ -1027,7 +1058,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
                 </SelectContent>
               </Select>
             </div>
-          </form> */}
+          </form>
         </div>
         <DrawerFooter>
           <Button>Submit</Button>

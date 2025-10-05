@@ -1,0 +1,4 @@
+src/web/.next/**
+./src/web/.next/**
+.next/**
+src/web/out/**

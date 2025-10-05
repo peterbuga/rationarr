@@ -79,9 +79,7 @@ async def list_indexers():
             ):
                 indexer_key = name_obj.lower()
 
-                if indexer_key == member_name.lower() and indexer_key in list(
-                    prowlarr_indexers.keys()
-                ):
+                if indexer_key == member_name.lower():
                     rationarr_indexers[indexer_key] = IndexerListOutputModel(
                         **{
                             "id": name_idx,
@@ -91,9 +89,9 @@ async def list_indexers():
                             .strip(),
                             "alias": member_obj.alias or name_obj.upper(),
                             "type": indexer_key,
-                            "url": prowlarr_indexers[indexer_key][
-                                "indexerUrls"
-                            ],
+                            "url": prowlarr_indexers.get(
+                                indexer_key, {"indexerUrls": []}
+                            )["indexerUrls"],
                         }
                     )
 

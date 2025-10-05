@@ -15,7 +15,7 @@ from app.utils.url import build_url
 
 
 class Unit3d(BaseIndexer):
-    # name = "Unit3d [generic]"
+    name = "Unit3d [generic]"
     api_key = None
 
     def __init__(self, **kwargs):
@@ -151,7 +151,11 @@ class Unit3d(BaseIndexer):
 
     async def extract_info(self):
         async with httpx.AsyncClient() as client:
-            endpoint_url = f"{self.url}/api/user?api_token={self.api_key}"
+            endpoint_url = build_url(
+                host=self.url,
+                path="/api/user",
+                query={"api_token": self.api_key},
+            )
             response = await client.get(endpoint_url, timeout=10)
             response.raise_for_status()
 

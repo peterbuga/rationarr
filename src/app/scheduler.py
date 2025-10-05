@@ -1,4 +1,3 @@
-import datetime
 import importlib
 import logging
 
@@ -44,8 +43,6 @@ async def scheduled_crawl(indexer: Indexer):
 
 
 async def exchange_points():
-    logging.warning(f"test {datetime.datetime.now()}")
-    # return
     # Get the latest `points` entries for all the indexers
     s = (
         select(
