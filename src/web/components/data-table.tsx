@@ -981,7 +981,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
             Showing total visitors for the last 6 months
           </DrawerDescription> */}
         </DrawerHeader>
-        <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
+        {/* <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
           {!isMobile && (
             <>
               <ChartContainer config={chartConfig}>
@@ -1111,7 +1111,7 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
               </Select>
             </div>
           </form>
-        </div>
+        </div> */}
         <DrawerFooter>
           <Button>Submit</Button>
           <DrawerClose asChild>
