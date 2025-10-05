@@ -1,8 +1,7 @@
 import Image from "next/image";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 // import { ModeToggle } from "@/components/theme-toggle";
 // import { ThemeDropdown } from "@/components/theme-dropdown";
-
 
 export default function Home() {
   return (

@@ -1,7 +1,12 @@
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react"
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  ReactElement,
+  JSXElementConstructor,
+  ReactNode,
+  ReactPortal,
+} from "react";
 import { ModeToggle } from "@/components/theme-toggle";
 
 export function SiteHeader(props: { title: string }) {
@@ -29,5 +34,5 @@ export function SiteHeader(props: { title: string }) {
         </div>
       </div>
     </header>
-  )
+  );
 }

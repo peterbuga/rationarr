@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import path from 'path';
+import path from "path";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["localhost:3000", "localhost:8009"],
@@ -8,9 +8,9 @@ const nextConfig: NextConfig = {
   // eslint: {
   //   dirs: ["./src/web"],
   // },
-  output: 'export',
+  output: "export",
   turbopack: {
-    root: path.join(__dirname, '../..'),
+    root: path.join(__dirname, "../.."),
   },
   webpack(config) {
     config.resolve.alias["@"] = path.resolve(__dirname, ".");

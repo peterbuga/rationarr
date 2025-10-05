@@ -1,9 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Area, AreaChart, CartesianGrid, Line, LineChart, XAxis } from "recharts"
+import * as React from "react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  XAxis,
+} from "recharts";
 
-import { useIsMobile } from "@/hooks/use-mobile"
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Card,
   CardAction,
@@ -12,27 +19,24 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from "@/components/ui/toggle-group"
-import useSWR from 'swr';
+} from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import useSWR from "swr";
 
-export const description = "An interactive area chart"
+export const description = "An interactive area chart";
 
 const chartConfig = {
   ratio: {
@@ -63,7 +67,7 @@ const chartConfig = {
     label: "Upload",
     color: "#01731F",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -71,48 +75,63 @@ const fetcher = async (url: string) => {
 };
 
 export function ChartLineMultiple(props: any) {
-  const { data, isLoading, error } = useSWR(`/api/scraper/${props.indexer.id}`, fetcher, {
-    refreshWhenOffline: false,
-    revalidateOnFocus: false,
-  });
+  const { data, isLoading, error } = useSWR(
+    `/api/scraper/${props.indexer.id}`,
+    fetcher,
+    {
+      refreshWhenOffline: false,
+      revalidateOnFocus: false,
+    },
+  );
 
-  const isMobile = useIsMobile()
-  const [timeRange, setTimeRange] = React.useState("90d")
+  const isMobile = useIsMobile();
+  const [timeRange, setTimeRange] = React.useState("90d");
   const [filteredData, setFilteredData] = React.useState<object[]>([]);
 
   React.useEffect(() => {
     if (isMobile) {
-      setTimeRange("7d")
+      setTimeRange("7d");
     }
 
     if (!isLoading) {
       let chartData: any[] = [];
 
-      for (const [key, entries] of Object.entries(data as Record<string, unknown>)) {
-        for (const [dt, value] of Object.entries(entries as Record<string, unknown>)) {
+      for (const [key, entries] of Object.entries(
+        data as Record<string, unknown>,
+      )) {
+        for (const [dt, value] of Object.entries(
+          entries as Record<string, unknown>,
+        )) {
           const foundDate = chartData.find((item: any) => item.date === dt);
 
           // convert bytes to megabytes
           let valueNew;
-          if (['download', 'upload', 'buffer'].includes(key)) {
-            valueNew = (value as number !== 0) ? ((value as number) / 1024 / 1024).toFixed(2) : value
+          if (["download", "upload", "buffer"].includes(key)) {
+            valueNew =
+              (value as number) !== 0
+                ? ((value as number) / 1024 / 1024).toFixed(2)
+                : value;
           } else {
-            valueNew = value
+            valueNew = value;
           }
 
           if (!foundDate) {
             chartData.push({
-              "date": dt, 
-              [key+"Orig"]: valueNew, 
-              [key]: valueNew as number ? Math.log10(valueNew as number) : 0
-            })
+              date: dt,
+              [key + "Orig"]: valueNew,
+              [key]: (valueNew as number) ? Math.log10(valueNew as number) : 0,
+            });
           } else {
-            chartData = chartData.map(item =>
-              item.date === dt ? {
-                ...item, 
-                [key+"Orig"]: valueNew, 
-                [key]: valueNew as number ? Math.log10(valueNew as number) : 0
-              } : item
+            chartData = chartData.map((item) =>
+              item.date === dt
+                ? {
+                    ...item,
+                    [key + "Orig"]: valueNew,
+                    [key]: (valueNew as number)
+                      ? Math.log10(valueNew as number)
+                      : 0,
+                  }
+                : item,
             );
           }
         }
@@ -135,12 +154,14 @@ export function ChartLineMultiple(props: any) {
       // setFilteredData(filteredData);
       setFilteredData(chartData);
     }
-  }, [isMobile, data, isLoading, timeRange])
+  }, [isMobile, data, isLoading, timeRange]);
 
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle><span className="font-bold">{props.indexer.name}</span> stats</CardTitle>
+        <CardTitle>
+          <span className="font-bold">{props.indexer.name}</span> stats
+        </CardTitle>
         {/* <CardDescription>January - June 2024</CardDescription> */}
         <CardAction>
           {/* <ToggleGroup
@@ -177,7 +198,10 @@ export function ChartLineMultiple(props: any) {
         </CardAction>
       </CardHeader>
       <CardContent>
-        <ChartContainer className="w-full h-[400px] max-h-[400px] overflow-hidden" config={chartConfig}>
+        <ChartContainer
+          className="w-full h-[400px] max-h-[400px] overflow-hidden"
+          config={chartConfig}
+        >
           <LineChart
             accessibilityLayer
             data={filteredData}
@@ -193,104 +217,120 @@ export function ChartLineMultiple(props: any) {
               axisLine={false}
               tickMargin={8}
               tickFormatter={(value) => {
-                const date = new Date(value)
+                const date = new Date(value);
                 return date.toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
-                  hour: "numeric"
-                })
+                  hour: "numeric",
+                });
               }}
             />
-            <ChartTooltip 
-              cursor={true} 
+            <ChartTooltip
+              cursor={true}
               content={
-                <ChartTooltipContent 
+                <ChartTooltipContent
                   labelFormatter={(value) => {
                     return new Date(value).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
-                    })
+                    });
                   }}
                   indicator="line"
                   formatter={(value, name, props, item, index) => {
                     // console.log(value, name, props, chartConfig[name])
-                    return [chartConfig[name as keyof typeof chartConfig].label,' => ', props.payload[name+"Orig"]]
-                  }} 
+                    return [
+                      chartConfig[name as keyof typeof chartConfig].label,
+                      " => ",
+                      props.payload[name + "Orig"],
+                    ];
+                  }}
                 />
               }
             />
             {Object.entries(chartConfig).map(([attr, value]) => {
               if (Object.keys(value).length) {
-                return <Line
-                  key={attr}
-                  dataKey={attr}
-                  type="monotone"
-                  stroke={`var(--color-${attr})`}
-                  strokeWidth={2}
-                  dot={false}
-                />
+                return (
+                  <Line
+                    key={attr}
+                    dataKey={attr}
+                    type="monotone"
+                    stroke={`var(--color-${attr})`}
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                );
               }
             })}
           </LineChart>
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function ChartAreaInteractive(props: any) {
-  const { data, isLoading, error } = useSWR(`/api/scraper/${props.indexer.id}`, fetcher, {
-    refreshWhenOffline: false,
-    revalidateOnFocus: false,
-  });
+  const { data, isLoading, error } = useSWR(
+    `/api/scraper/${props.indexer.id}`,
+    fetcher,
+    {
+      refreshWhenOffline: false,
+      revalidateOnFocus: false,
+    },
+  );
 
-  const isMobile = useIsMobile()
-  const [timeRange, setTimeRange] = React.useState("90d")
+  const isMobile = useIsMobile();
+  const [timeRange, setTimeRange] = React.useState("90d");
   const [filteredData, setFilteredData] = React.useState<object[]>([]);
-  
+
   React.useEffect(() => {
     if (isMobile) {
-      setTimeRange("7d")
+      setTimeRange("7d");
     }
 
     if (!isLoading) {
       let chartData: any[] = [];
 
-      for (const [key, entries] of Object.entries(data as Record<string, unknown>)) {
-        for (const [dt, value] of Object.entries(entries as Record<string, unknown>)) {
+      for (const [key, entries] of Object.entries(
+        data as Record<string, unknown>,
+      )) {
+        for (const [dt, value] of Object.entries(
+          entries as Record<string, unknown>,
+        )) {
           const foundDate = chartData.find((item: any) => item.date === dt);
           if (!foundDate) {
-            chartData.push({"date": dt, [key]: value})
+            chartData.push({ date: dt, [key]: value });
           } else {
-            chartData = chartData.map(item =>
-              item.date === dt ? { ...item, [key]: value } : item
+            chartData = chartData.map((item) =>
+              item.date === dt ? { ...item, [key]: value } : item,
             );
           }
         }
       }
 
       const filteredData = chartData.filter((item) => {
-        const date = new Date(item.date)
-        const referenceDate = new Date()
-        let daysToSubtract = 90
+        const date = new Date(item.date);
+        const referenceDate = new Date();
+        let daysToSubtract = 90;
         if (timeRange === "30d") {
-          daysToSubtract = 30
+          daysToSubtract = 30;
         } else if (timeRange === "7d") {
-          daysToSubtract = 7
+          daysToSubtract = 7;
         }
-        const startDate = new Date(referenceDate)
-        startDate.setDate(startDate.getDate() - daysToSubtract)
-        return date >= startDate
-      })
+        const startDate = new Date(referenceDate);
+        startDate.setDate(startDate.getDate() - daysToSubtract);
+        return date >= startDate;
+      });
 
       setFilteredData(filteredData);
     }
-  }, [isMobile, data, isLoading, timeRange])
+  }, [isMobile, data, isLoading, timeRange]);
 
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle><span className="font-bold">{props.indexer.name}</span> stats</CardTitle>
+        <CardTitle>
+          <span className="font-bold">{props.indexer.name}</span> stats
+        </CardTitle>
         {/* <CardDescription>
           <span className="hidden @[540px]/card:block">
             Total for the last 3 months
@@ -407,12 +447,12 @@ export function ChartAreaInteractive(props: any) {
               tickMargin={8}
               minTickGap={16}
               tickFormatter={(value) => {
-                const date = new Date(value)
+                const date = new Date(value);
                 return date.toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
-                  hour: "numeric"
-                })
+                  hour: "numeric",
+                });
               }}
             />
             <ChartTooltip
@@ -423,14 +463,14 @@ export function ChartAreaInteractive(props: any) {
                     return new Date(value).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
-                    })
+                    });
                   }}
                   indicator="dot"
                   formatter={(value, name, props) => {
                     // console.log(value, name, props)
                     // `Profit: ${props.payload.actualProfit}`,
                     // 'Revenue'
-                    return [value, name]
+                    return [value, name];
                   }}
                 />
               }
@@ -475,5 +515,5 @@ export function ChartAreaInteractive(props: any) {
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

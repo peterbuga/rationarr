@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -11,15 +11,15 @@ import {
   useSensors,
   type DragEndEvent,
   type UniqueIdentifier,
-} from "@dnd-kit/core"
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
+} from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
   arrayMove,
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
   IconChevronDown,
   IconChevronLeft,
@@ -33,7 +33,7 @@ import {
   IconLoader,
   IconPlus,
   IconTrendingUp,
-} from "@tabler/icons-react"
+} from "@tabler/icons-react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -48,21 +48,21 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from "@tanstack/react-table"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-import { toast } from "sonner"
-import { z } from "zod"
+} from "@tanstack/react-table";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { toast } from "sonner";
+import { z } from "zod";
 
-import { useIsMobile } from "@/hooks/use-mobile"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-import { Checkbox } from "@/components/ui/checkbox"
+} from "@/components/ui/chart";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Drawer,
   DrawerClose,
@@ -72,7 +72,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
+} from "@/components/ui/drawer";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -80,9 +80,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -91,8 +91,8 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -100,13 +100,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogClose,
@@ -116,9 +111,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Switch } from "@/components/ui/switch"
-import useSWR from 'swr';
+} from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import useSWR from "swr";
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -132,19 +127,21 @@ export function AddIndexer() {
   });
 
   const initFormData = {
-    name: '',
-    url: '',
+    name: "",
+    url: "",
     api_key: null,
     cookie: null,
-    type: '',
+    type: "",
     username: null,
     password: null,
     mfa_key: null,
     active: true,
     exchange_points: null,
-  }
+  };
 
-  const [selectedIndexer, setSelectedIndexer] = useState<string | undefined>(undefined);
+  const [selectedIndexer, setSelectedIndexer] = useState<string | undefined>(
+    undefined,
+  );
   const [indexerUrls, setIndexerUrls] = useState<string[]>([]);
   const [selectedUrl, setSelectedUrl] = useState<string | undefined>(undefined);
   const [indexerName, setIndexerName] = useState<string>("");
@@ -155,27 +152,27 @@ export function AddIndexer() {
 
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name.replace('_custom', '')]: value
+      [name.replace("_custom", "")]: value,
     }));
   };
-  
+
   const handleSaveChanges = async () => {
     setIsLoadingSave(true);
 
     try {
-      const res = await fetch('/api/indexer', {
-        method: 'POST',
+      const res = await fetch("/api/indexer", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
-      
+
       const data = await res.json();
       setOpenDialog(false);
-      
+
       // Reset form
       setFormData(initFormData);
 
@@ -190,10 +187,12 @@ export function AddIndexer() {
 
   useEffect(() => {
     if (selectedIndexer) {
-      const indexer = data.find((indexer: any) => indexer.name === selectedIndexer);
+      const indexer = data.find(
+        (indexer: any) => indexer.name === selectedIndexer,
+      );
       setIndexerUrls(indexer.url || []);
       setIndexerName(selectedIndexer);
-      handleInputChange({target: {name: 'type', value: indexer.type}});
+      handleInputChange({ target: { name: "type", value: indexer.type } });
     } else {
       setIndexerUrls([]);
     }
@@ -201,15 +200,15 @@ export function AddIndexer() {
   }, [selectedIndexer, data]);
 
   useEffect(() => {
-    handleInputChange({target: {name: 'url', value: selectedUrl}});
+    handleInputChange({ target: { name: "url", value: selectedUrl } });
   }, [selectedUrl]);
 
   useEffect(() => {
-    handleInputChange({target: {name: 'name', value: indexerName}});
+    handleInputChange({ target: { name: "name", value: indexerName } });
   }, [indexerName]);
 
   useEffect(() => {
-    handleInputChange({target: {name: 'active', value: indexerActive}});
+    handleInputChange({ target: { name: "active", value: indexerActive } });
   }, [indexerActive]);
 
   return (
@@ -236,20 +235,22 @@ export function AddIndexer() {
                 onValueChange={(val) => {
                   setSelectedIndexer(val);
                 }}
-                >
+              >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select indexer"/>
+                  <SelectValue placeholder="Select indexer" />
                 </SelectTrigger>
                 <SelectContent>
                   {data?.map((item: any, i: number) => {
                     return (
-                      <SelectItem value={item.name} key={i}>{item.name}</SelectItem>
-                    )
+                      <SelectItem value={item.name} key={i}>
+                        {item.name}
+                      </SelectItem>
+                    );
                   })}
                 </SelectContent>
               </Select>
             </div>
-            {(!selectedIndexer || indexerUrls.length != 0) && 
+            {(!selectedIndexer || indexerUrls.length != 0) && (
               <div className="grid gap-3">
                 <Label htmlFor="address">Indexer Address</Label>
                 <Select
@@ -260,50 +261,82 @@ export function AddIndexer() {
                   disabled={!selectedIndexer}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder={selectedIndexer ? "Select indexer url" : "Select indexer first"} />
+                    <SelectValue
+                      placeholder={
+                        selectedIndexer
+                          ? "Select indexer url"
+                          : "Select indexer first"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Urls</SelectLabel>
                       {indexerUrls.map((opt, i) => (
-                        <SelectItem key={i} value={opt}>{opt}</SelectItem>
+                        <SelectItem key={i} value={opt}>
+                          {opt}
+                        </SelectItem>
                       ))}
                     </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
-            } 
-            {(selectedIndexer && indexerUrls.length == 0) && 
+            )}
+            {selectedIndexer && indexerUrls.length == 0 && (
               <div className="grid gap-3">
                 <Label htmlFor="url_custom">Indexer Address</Label>
-                <Input id="url_custom" name="url_custom" placeholder={`Enter custom ${selectedIndexer} address`} onChange={handleInputChange} />
+                <Input
+                  id="url_custom"
+                  name="url_custom"
+                  placeholder={`Enter custom ${selectedIndexer} address`}
+                  onChange={handleInputChange}
+                />
               </div>
-            }
+            )}
             <div className="flex">
               <div className="flex flex-row grid gap-3 w-2/3">
-                <Label htmlFor="username">Indexer Name (Rationarr idenfifier)</Label>
-                <Input id="name" name="name" value={indexerName} onChange={(e) => setIndexerName(e.target.value)} />
+                <Label htmlFor="username">
+                  Indexer Name (Rationarr idenfifier)
+                </Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={indexerName}
+                  onChange={(e) => setIndexerName(e.target.value)}
+                />
               </div>
               <div className="flex flex-row justify-center grid gap-3 w-1/3">
                 <Label htmlFor="active">Active</Label>
-                <Switch id="active" checked={indexerActive} onCheckedChange={(e) => setIndexerActive(e)} />
+                <Switch
+                  id="active"
+                  checked={indexerActive}
+                  onCheckedChange={(e) => setIndexerActive(e)}
+                />
               </div>
             </div>
             <div className="grid gap-3">
               <Label htmlFor="username">Username</Label>
-              <Input id="username" name="username" onChange={handleInputChange} />
+              <Input
+                id="username"
+                name="username"
+                onChange={handleInputChange}
+              />
             </div>
             <div className="grid gap-3">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" onChange={handleInputChange} />
+              <Input
+                id="password"
+                name="password"
+                onChange={handleInputChange}
+              />
             </div>
             <div className="grid gap-3">
               <Label htmlFor="cookie">API key</Label>
-              <Input id="api_key" name="api_key" onChange={handleInputChange}/>
+              <Input id="api_key" name="api_key" onChange={handleInputChange} />
             </div>
             <div className="grid gap-3">
               <Label htmlFor="cookie">Cookies</Label>
-              <Input id="cookie" name="cookie" onChange={handleInputChange}/>
+              <Input id="cookie" name="cookie" onChange={handleInputChange} />
             </div>
             <div className="grid gap-3">
               <Label htmlFor="mfa">MFA/2FA Setup Code</Label>
@@ -311,20 +344,30 @@ export function AddIndexer() {
             </div>
             <div className="grid gap-3">
               <Label htmlFor="mfa">Exchange Points</Label>
-              <Input type="number" id="exchange_points" name="exchange_points" onChange={handleInputChange} />
+              <Input
+                type="number"
+                id="exchange_points"
+                name="exchange_points"
+                onChange={handleInputChange}
+              />
             </div>
           </div>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit" onClick={handleSaveChanges}
-                disabled={isLoadingSave} >{isLoadingSave ? 'Saving...' : 'Save Changes'}</Button>
+            <Button
+              type="submit"
+              onClick={handleSaveChanges}
+              disabled={isLoadingSave}
+            >
+              {isLoadingSave ? "Saving..." : "Save Changes"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </form>
     </Dialog>
-  )
+  );
 }
 
 export const schema = z.object({
@@ -337,7 +380,7 @@ export const schema = z.object({
   reviewer: z.string(),
   exchange_points: z.int(),
   type: z.string(),
-})
+});
 
 // Create a separate component for the drag handle
 // function DragHandle({ id }: { id: number }) {
@@ -362,16 +405,16 @@ export const schema = z.object({
 const handleIndexerDelete = async (id: string) => {
   try {
     const res = await fetch(`/api/indexer/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
-    
+
     const data = await res.text();
-    console.log('data delete', data)
+    console.log("data delete", data);
   } catch (error) {
-    console.error('delete', error);
+    console.error("delete", error);
   } finally {
     window.location.reload();
   }
@@ -415,7 +458,11 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     header: "Name",
     cell: ({ row }) => {
       // return <span className="font-bold">{row.original.name}</span>
-      return <div className="w-32"><TableCellViewer item={row.original} /></div>
+      return (
+        <div className="w-32">
+          <TableCellViewer item={row.original} />
+        </div>
+      );
     },
     enableHiding: false,
   },
@@ -434,7 +481,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     accessorKey: "exchange_points",
     header: "Exchange Points",
     cell: ({ row }) => {
-      return <span className="">{row.original.exchange_points}</span>
+      return <span className="">{row.original.exchange_points}</span>;
     },
     enableHiding: false,
   },
@@ -442,7 +489,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     accessorKey: "type",
     header: "Indexer type",
     cell: ({ row }) => {
-      return <span className="">{row.original.type}</span>
+      return <span className="">{row.original.type}</span>;
     },
     enableHiding: false,
   },
@@ -549,7 +596,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   {
     id: "actions",
     header: () => <div className="w-full text-right">Actions</div>,
-    cell: ({row}) => (
+    cell: ({ row }) => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -566,7 +613,12 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
           {/* <DropdownMenuItem>Make a copy</DropdownMenuItem>
           <DropdownMenuItem>Favorite</DropdownMenuItem> */}
           <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={(e) => handleIndexerDelete(row.id)} variant="destructive">Delete</DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={(e) => handleIndexerDelete(row.id)}
+            variant="destructive"
+          >
+            Delete
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     ),
@@ -576,12 +628,12 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     header: () => null,
     cell: ({ row }) => <div></div>,
   },
-]
+];
 
 function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
-  })
+  });
 
   return (
     <TableRow
@@ -600,37 +652,37 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
         </TableCell>
       ))}
     </TableRow>
-  )
+  );
 }
 
 export function DataTable({
   data: initialData,
 }: {
-  data: z.infer<typeof schema>[]
+  data: z.infer<typeof schema>[];
 }) {
-  const [data, setData] = React.useState(() => initialData)
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [data, setData] = React.useState(() => initialData);
+  const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+    React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [sorting, setSorting] = React.useState<SortingState>([])
+    [],
+  );
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
-  })
-  const sortableId = React.useId()
+  });
+  const sortableId = React.useId();
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
     useSensor(TouchSensor, {}),
-    useSensor(KeyboardSensor, {})
-  )
+    useSensor(KeyboardSensor, {}),
+  );
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(
     () => data?.map(({ id }) => id) || [],
-    [data]
-  )
+    [data],
+  );
 
   const table = useReactTable({
     data,
@@ -655,16 +707,16 @@ export function DataTable({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-  })
+  });
 
   function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
+    const { active, over } = event;
     if (active && over && active.id !== over.id) {
       setData((data) => {
-        const oldIndex = dataIds.indexOf(active.id)
-        const newIndex = dataIds.indexOf(over.id)
-        return arrayMove(data, oldIndex, newIndex)
-      })
+        const oldIndex = dataIds.indexOf(active.id);
+        const newIndex = dataIds.indexOf(over.id);
+        return arrayMove(data, oldIndex, newIndex);
+      });
     }
   }
 
@@ -719,7 +771,7 @@ export function DataTable({
                 .filter(
                   (column) =>
                     typeof column.accessorFn !== "undefined" &&
-                    column.getCanHide()
+                    column.getCanHide(),
                 )
                 .map((column) => {
                   return (
@@ -733,7 +785,7 @@ export function DataTable({
                     >
                       {column.id}
                     </DropdownMenuCheckboxItem>
-                  )
+                  );
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -763,10 +815,10 @@ export function DataTable({
                             ? null
                             : flexRender(
                                 header.column.columnDef.header,
-                                header.getContext()
+                                header.getContext(),
                               )}
                         </TableHead>
-                      )
+                      );
                     })}
                   </TableRow>
                 ))}
@@ -808,7 +860,7 @@ export function DataTable({
               <Select
                 value={`${table.getState().pagination.pageSize}`}
                 onValueChange={(value) => {
-                  table.setPageSize(Number(value))
+                  table.setPageSize(Number(value));
                 }}
               >
                 <SelectTrigger size="sm" className="w-20" id="rows-per-page">
@@ -889,7 +941,7 @@ export function DataTable({
         <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
       </TabsContent> */}
     </Tabs>
-  )
+  );
 }
 
 const chartData = [
@@ -899,7 +951,7 @@ const chartData = [
   { month: "April", desktop: 73, mobile: 190 },
   { month: "May", desktop: 209, mobile: 130 },
   { month: "June", desktop: 214, mobile: 140 },
-]
+];
 
 const chartConfig = {
   desktop: {
@@ -910,10 +962,10 @@ const chartConfig = {
     label: "Mobile",
     color: "var(--primary)",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
-  const isMobile = useIsMobile()
+  const isMobile = useIsMobile();
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
@@ -1068,5 +1120,5 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }

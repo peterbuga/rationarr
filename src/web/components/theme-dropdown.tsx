@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useTheme } from "next-themes"
+import * as React from "react";
+import { useTheme } from "next-themes";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { Palette } from "lucide-react"
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Palette } from "lucide-react";
 
 const themes = [
   { name: "Light", value: "light" },
@@ -17,10 +17,10 @@ const themes = [
   // { name: "Blue", value: "blue" },
   // { name: "Forest", value: "forest" },
   // { name: "Rose", value: "rose" },
-]
+];
 
 export function ThemeDropdown() {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
 
   return (
     <DropdownMenu>
@@ -42,5 +42,5 @@ export function ThemeDropdown() {
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
