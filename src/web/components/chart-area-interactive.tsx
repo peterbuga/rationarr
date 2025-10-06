@@ -151,8 +151,17 @@ export function ChartLineMultiple(props: any) {
       //   return date >= startDate
       // })
 
-      // setFilteredData(filteredData);
-      setFilteredData(chartData);
+      const filteredData = chartData
+        .map((item) => {
+          const dt = new Date(item.date);
+          return {
+            ...item,
+            date: dt,
+          };
+        })
+        .sort((a, b) => a.date - b.date);
+
+      setFilteredData(filteredData);
     }
   }, [isMobile, data, isLoading, timeRange]);
 

@@ -7,7 +7,7 @@
     "build": "next build ./src/web",
     "start": "next start ./src/web",
     "lint": "next lint",
-    "tsc": "tsc --noEmit ./src/web/",
+    "tsc": "tsc -p ./src/web/tsconfig.json --noEmit",
     "check-format": "prettier --check ./src/web",
     "fix-format": "prettier --write ./src/web"
   },
