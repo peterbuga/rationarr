@@ -152,14 +152,14 @@ export function ChartLineMultiple(props: any) {
       // })
 
       const filteredData = chartData
-        .map((item) => {
-          const dt = new Date(item.date);
-          return {
-            ...item,
-            date: dt,
-          };
-        })
-        .sort((a, b) => a.date - b.date);
+        // .map((item) => {
+        //   const dt = new Date(item.date);
+        //   return {
+        //     ...item,
+        //     date: dt,
+        //   };
+        // })
+        .sort((a, b) => (new Date(a.date) as any) - (new Date(b.date) as any ));
 
       setFilteredData(filteredData);
     }
@@ -239,9 +239,12 @@ export function ChartLineMultiple(props: any) {
               content={
                 <ChartTooltipContent
                   labelFormatter={(value) => {
+                    // console.log(value);
                     return new Date(value).toLocaleDateString("en-US", {
+                      year: "2-digit",
                       month: "short",
                       day: "numeric",
+                      hour: "2-digit",
                     });
                   }}
                   indicator="line"
