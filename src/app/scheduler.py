@@ -122,7 +122,7 @@ async def start_scheduler():
             trigger=IntervalTrigger(seconds=settings.INTERVAL_SCRAPE),
             misfire_grace_time=30,
             kwargs={"indexer": indexer},
-            id=indexer.name,
+            id=str(indexer.id),
             name=slugify(indexer.name, separator="_"),
             replace_existing=True,
         )

@@ -17,7 +17,9 @@ from app.schemas.common import ScraperFields
 
 class Scraper(Base):
     id = Column(Uuid, primary_key=True, index=True, default=uuid.uuid4)
-    indexer_id = Column(Uuid, ForeignKey("indexer.id"), index=True)
+    indexer_id = Column(
+        Uuid, ForeignKey("indexer.id", ondelete="CASCADE"), index=True
+    )
     attribute = Column(String)
     value = Column(String)
 

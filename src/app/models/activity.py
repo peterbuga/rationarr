@@ -9,7 +9,9 @@ from app.models._util import TimestampedModel
 
 class Activity(Base):
     id = Column(Uuid, primary_key=True, index=True, default=uuid.uuid4)
-    indexer_id = Column(Uuid, ForeignKey("indexer.id"), index=True)
+    indexer_id = Column(
+        Uuid, ForeignKey("indexer.id", ondelete="CASCADE"), index=True
+    )
     activity = Column(String)
 
 

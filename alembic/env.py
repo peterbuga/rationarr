@@ -17,7 +17,7 @@ from alembic import context
 
 # from db.base import Base
 # from models import Base
-from app.db.base import Base
+from app.models import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -61,6 +61,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        version_table="migration",
     )
 
     with context.begin_transaction():
@@ -88,6 +89,7 @@ async def run_migrations_online() -> None:
             lambda conn: context.configure(
                 connection=conn,
                 target_metadata=target_metadata,
+                version_table="migration",
             )
         )
         await connection.run_sync(lambda _: context.run_migrations())
