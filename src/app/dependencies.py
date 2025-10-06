@@ -1,16 +1,29 @@
 from typing import Annotated
 
+from apscheduler.executors.pool import ProcessPoolExecutor, ThreadPoolExecutor
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.db import AsyncSessionLocal
 
 
 def create_scheduler() -> AsyncIOScheduler:
     scheduler = AsyncIOScheduler(
-        # jobstores={'default': MemoryJobStore()},
-        timezone="UTC"
+        jobstores={
+            "default": SQLAlchemyJobStore(
+                tablename="job",
+                url=str(settings.DATABASE_URI).replace("+asyncpg", ""),
+            )
+        },
+        executors={
+            "default": ThreadPoolExecutor(10),
+            "processpool": ProcessPoolExecutor(3),
+        },
+        job_defaults={"coalesce": False, "max_instances": 1},
+        timezone="UTC",
     )
     scheduler.start()
 
