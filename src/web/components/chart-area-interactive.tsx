@@ -239,7 +239,6 @@ export function ChartLineMultiple(props: any) {
               content={
                 <ChartTooltipContent
                   labelFormatter={(value) => {
-                    // console.log(value);
                     return new Date(value).toLocaleDateString("en-US", {
                       year: "2-digit",
                       month: "short",
@@ -249,7 +248,6 @@ export function ChartLineMultiple(props: any) {
                   }}
                   indicator="line"
                   formatter={(value, name, props, item, index) => {
-                    // console.log(value, name, props, chartConfig[name])
                     return [
                       chartConfig[name as keyof typeof chartConfig].label,
                       " => ",

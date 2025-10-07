@@ -3,7 +3,8 @@ import logging
 
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
-from slugify import slugify
+
+# from slugify import slugify
 from sqlalchemy import func, select
 
 from app.config import settings
@@ -31,15 +32,25 @@ async def get_indexer_instance(indexer: Indexer) -> BaseIndexer:
     return indexer_instance
 
 
-async def scheduled_crawl(indexer: Indexer):
-    indexer_instance = await get_indexer_instance(indexer)
+async def scheduled_crawls():
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(Indexer)
+            .where(Indexer.active.is_(True))
+            .order_by(Indexer.created_at)
+        )
+        indexers = result.scalars().all()
 
-    try:
-        await indexer_instance.extract_info()
-    except Exception as e:
-        logging.error(f"Failed to crawl {indexer.url}: {e}")
+    for indexer in indexers:
+        logging.warning(f"Job interval added for {indexer.name}")
 
-    await flarsolverr_destroy_session(indexer.type)
+        try:
+            indexer_instance = await get_indexer_instance(indexer)
+            await indexer_instance.extract_info()
+        except Exception as e:
+            logging.error(f"Failed to crawl {indexer.url}: {e}")
+
+        await flarsolverr_destroy_session(indexer.type)
 
 
 async def exchange_points():
@@ -105,25 +116,15 @@ async def exchange_points():
 
 
 async def start_scheduler(scheduler: SchedulerSessionDep = get_scheduler()):
-    async with AsyncSessionLocal() as session:
-        result = await session.execute(
-            select(Indexer)
-            .where(Indexer.active.is_(True))
-            .order_by(Indexer.created_at)
-        )
-        indexers = result.scalars().all()
-
-    for indexer in indexers:
-        logging.warning(f"Job interval added for {indexer.name}")
-        scheduler.add_job(
-            func=scheduled_crawl,
-            trigger=IntervalTrigger(seconds=settings.INTERVAL_SCRAPE),
-            misfire_grace_time=30,
-            kwargs={"indexer": indexer},
-            id=str(indexer.id),
-            name=slugify(indexer.name, separator="_"),
-            replace_existing=True,
-        )
+    scheduler.add_job(
+        func=scheduled_crawls,
+        trigger=IntervalTrigger(seconds=settings.INTERVAL_SCRAPE),
+        misfire_grace_time=30,
+        id="scheduled_crawls",
+        name="scheduled_crawls",
+        # name=slugify(indexer.name, separator="_"),
+        replace_existing=True,
+    )
 
     scheduler.add_job(
         func=exchange_points,
@@ -131,7 +132,6 @@ async def start_scheduler(scheduler: SchedulerSessionDep = get_scheduler()):
         # trigger=CronTrigger(second="*/10"),
         # trigger=IntervalTrigger(seconds=30),
         misfire_grace_time=30,
-        # kwargs={"indexer": indexer},
         id="echange_points",
         name="echange_points",
         replace_existing=True,

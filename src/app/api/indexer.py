@@ -1,17 +1,16 @@
 import inspect
-import logging
+
+# import logging
 import re
 import sys
 import uuid
 
 import httpx
-from apscheduler.triggers.interval import IntervalTrigger
 from fastapi import APIRouter
-from slugify import slugify
 from sqlalchemy import delete, select
 
 from app.config import settings
-from app.dependencies import DbSessionDep, SchedulerSessionDep
+from app.dependencies import DbSessionDep
 from app.indexers import *  # noqa: F403
 from app.indexers import base_indexer
 from app.models.indexer import (
@@ -20,7 +19,6 @@ from app.models.indexer import (
     IndexerListOutputModel,
     IndexerOutputModel,
 )
-from app.scheduler import scheduled_crawl
 from app.utils.url import build_url
 
 router = APIRouter()
@@ -110,38 +108,21 @@ async def get_indexers(db: DbSessionDep):
 
 
 @router.post("", response_model=IndexerOutputModel)
-async def add_indexer(
-    indexer: IndexerInputModel, db: DbSessionDep, scheduler: SchedulerSessionDep
-):
+async def add_indexer(indexer: IndexerInputModel, db: DbSessionDep):
     indexer = Indexer(**indexer.model_dump())
     db.add(indexer)
     await db.commit()
     await db.refresh(indexer)
     # print('ttt', indexer.__dict__, indexer.__mapper__)
 
-    # TODO: move into service
-    logging.warning(f"Job interval added for {indexer.name}")
-    scheduler.add_job(
-        func=scheduled_crawl,
-        trigger=IntervalTrigger(seconds=settings.INTERVAL_SCRAPE),
-        misfire_grace_time=30,
-        kwargs={"indexer": indexer},
-        id=str(indexer.id),
-        name=slugify(indexer.name, separator="_"),
-        replace_existing=True,
-    )
     return indexer.__dict__
 
 
 @router.delete("/{id}", status_code=204)
-async def remove_event(
-    id: uuid.UUID, db: DbSessionDep, scheduler: SchedulerSessionDep
-):
+async def remove_event(id: uuid.UUID, db: DbSessionDep):
     # result = await IndexerService.delete_events([event_id])
     stmt = delete(Indexer).where(Indexer.id == id)
     await db.execute(stmt)
     await db.commit()
-
-    scheduler.remove_job(str(id))
 
     return None
