@@ -77,3 +77,5 @@ yarn-error.log*
 next-env.d.ts
 
 !.env.template
+
+*.code-workspace

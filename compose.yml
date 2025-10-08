@@ -18,7 +18,7 @@ services:
       PROWLARR_HOST: "${PROWLARR_HOST}"
       PROWLARR_APIKEY: "${PROWLARR_APIKEY}"
       FLARESOULVERR_URL: "${FLARESOULVERR_URL}"
-      DATABASE_URI: "postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
+      DATABASE_URI: "postgresql+asyncpg://${POSTGRES_USER:-rationarr}:${POSTGRES_PASSWORD:-rationarr}@${POSTGRES_HOST:-rationarr-db}:${POSTGRES_PORT}/${POSTGRES_DB:-rationarr}"
     depends_on:
       - rationarr-db
 
@@ -27,8 +27,8 @@ services:
     container_name: rationarr-db
     hostname: rationarr-db
     environment:
-      POSTGRES_USER: "${POSTGRES_USER}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_USER: "${POSTGRES_USER:-rationarr}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-rationarr}"
       POSTGRES_DB: "${POSTGRES_DB:-rationarr}"
     # ports:
     #   - "5432:5432"

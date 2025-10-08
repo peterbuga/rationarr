@@ -7,8 +7,8 @@ services:
     hostname: rationarr-web
     command: "/bin/bash -c 'test -d /app/node_modules || npm ci && npm run dev'"
     working_dir: '/app'
-    # ports:
-    #   - '5173:5173'
+    ports:
+      - '5173:5173'
     volumes:
       - './:/app'
     labels:

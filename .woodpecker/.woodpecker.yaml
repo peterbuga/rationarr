@@ -23,10 +23,3 @@ steps:
         from_secret: "REGISTRY_USER"
       password:
         from_secret: "REGISTRY_PASSWORD"
-  - name: "docker-ls"
-    image: "alpine/curl"
-    environment:
-      WEBHOOK_RECREATE_URL:
-        from_secret: "WEBHOOK_RECREATE_URL"
-    commands:
-      - "curl -sL -X POST $WEBHOOK_RECREATE_URL"
