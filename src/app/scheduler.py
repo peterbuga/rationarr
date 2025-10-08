@@ -9,7 +9,7 @@ from sqlalchemy import func, select
 
 from app.config import settings
 from app.db import AsyncSessionLocal
-from app.dependencies import SchedulerSessionDep, get_scheduler
+from app.dependencies import get_scheduler
 from app.indexers.base_indexer import BaseIndexer
 from app.models import Indexer, Scraper
 from app.utils.flaresolverr import flarsolverr_destroy_session
@@ -115,7 +115,8 @@ async def exchange_points():
                 await flarsolverr_destroy_session(indexer.type)
 
 
-async def start_scheduler(scheduler: SchedulerSessionDep = get_scheduler()):
+async def start_scheduler():
+    scheduler = get_scheduler()
     scheduler.add_job(
         func=scheduled_crawls,
         trigger=IntervalTrigger(seconds=settings.INTERVAL_SCRAPE),
@@ -128,7 +129,7 @@ async def start_scheduler(scheduler: SchedulerSessionDep = get_scheduler()):
 
     scheduler.add_job(
         func=exchange_points,
-        trigger=CronTrigger(hour="*/3", minute=15, second=30),
+        trigger=CronTrigger(hour="*/6", minute=15, second=30),
         # trigger=CronTrigger(second="*/10"),
         # trigger=IntervalTrigger(seconds=30),
         misfire_grace_time=30,
