@@ -1,6 +1,5 @@
 from typing import Annotated
 
-from apscheduler.executors.pool import ProcessPoolExecutor, ThreadPoolExecutor
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import Depends
@@ -17,10 +16,6 @@ def create_scheduler() -> AsyncIOScheduler:
                 tablename="job",
                 url=str(settings.DATABASE_URI).replace("+asyncpg", ""),
             )
-        },
-        executors={
-            "default": ThreadPoolExecutor(10),
-            "processpool": ProcessPoolExecutor(3),
         },
         job_defaults={"coalesce": False, "max_instances": 1},
         timezone="UTC",
