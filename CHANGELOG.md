@@ -1,0 +1,58 @@
+# Changelog
+
+## 1.0.0 (2025-10-08)
+
+
+### Features
+
+* [app] Add `echange_points` for Unit3d based indexers ([58d1f4e](https://github.com/peterbuga/rationarr/commit/58d1f4e2453ac1b1052d9a7d54dbf09a35037902))
+* [app] Add helper `/api/indexer/prowlarr` to list available indexers ([8cee536](https://github.com/peterbuga/rationarr/commit/8cee536c67fc148842b384182b03a59722bf6c07))
+* [app] Add/remove scheduler on indexer add/delete ([5345856](https://github.com/peterbuga/rationarr/commit/5345856d4e281a0775b40f40f19bda041a82a85a))
+* [app] Enable `exchange_points` in scheduler ([0759084](https://github.com/peterbuga/rationarr/commit/07590845937e6f2fd5ddf7585dbfc023dbf4e2a6))
+* [app] Initial support for auto-exchange points ([2201bbe](https://github.com/peterbuga/rationarr/commit/2201bbe2b96a9ea564d2c314296fa0e2bc0557e1))
+* [app] Simplified scheduler crawls ([c1dd1fe](https://github.com/peterbuga/rationarr/commit/c1dd1feb1e2358534fbf3ea636f1005c1e1d43cd))
+* [app+web] Add activities section ([a57ddb5](https://github.com/peterbuga/rationarr/commit/a57ddb505ed05aa2e673721a641abb10df4839d8))
+* [web] Add `download` and `upload` metrics to graph ([2d629a9](https://github.com/peterbuga/rationarr/commit/2d629a9de8d30add59dd017975c6ec5bc05ade64))
+* [web] Add/delete indexer ([8483593](https://github.com/peterbuga/rationarr/commit/848359339e7cb54f77bc57ade62a9a9d802d1653))
+* [web] Ajust multiple charts per dashboard screen ([8cb476f](https://github.com/peterbuga/rationarr/commit/8cb476ff7f5cfe25bbf80b0f3158e8349b7bfcae))
+* [web] Allow adding custom `Unit3d` indexer ([0806c35](https://github.com/peterbuga/rationarr/commit/0806c352df4273c7dfeeb5adbc35baa8c430c410))
+* [web] New (fav)icon logo ([397578b](https://github.com/peterbuga/rationarr/commit/397578b6e8d87fdb227dcfd065ba046f70b9e505))
+* Add `hdspace` indexer ([e07540b](https://github.com/peterbuga/rationarr/commit/e07540be1cbbb7da59ba3e18cfd7265859c51c06))
+* Add `myanonamouse` indexer ([a933b57](https://github.com/peterbuga/rationarr/commit/a933b575e2deb69e6904e2bf079cfd41f3181715))
+* Add `points` data to charts ([5b50095](https://github.com/peterbuga/rationarr/commit/5b5009541673dfcd777388d183049933c4280d13))
+* Add `scenetime` indexer ([3e67fcd](https://github.com/peterbuga/rationarr/commit/3e67fcd62a59fba707483d5f0a64b2a0a5f24dee))
+* APScheduler di ([b0a70aa](https://github.com/peterbuga/rationarr/commit/b0a70aa856012b78071a0e188152fdbdc8ef81fc))
+* Changed chart type line ([cc21330](https://github.com/peterbuga/rationarr/commit/cc213305668afeb06fa0795dafc729f3b1e6e966))
+* Consistent save `size` value into bytes ([9f7ddd0](https://github.com/peterbuga/rationarr/commit/9f7ddd01e6bb22662b62a86192cdd1c0faa98118))
+* Custom `INTERVAL_SCRAPE` env variable ([5090e7d](https://github.com/peterbuga/rationarr/commit/5090e7d19de86f58e19bdc19704672114152c73c))
+* Dockerfile add alembic migration before start ([4f4f022](https://github.com/peterbuga/rationarr/commit/4f4f0225ada8eba692de094dc828f5ac1a9f3159))
+* First barely workable charts ([4562632](https://github.com/peterbuga/rationarr/commit/45626328c77e1d0ebb01b6c43eaffd69d4a304f4))
+* first commit ([0dcc31c](https://github.com/peterbuga/rationarr/commit/0dcc31c7e79ab63307f2fbc11d1ae268645a4d15))
+* Improved healthchecks ([7cd149b](https://github.com/peterbuga/rationarr/commit/7cd149bf66babef993bd1a24135d9c1c05dd5cf1))
+* serve web-ui via fastapi ([4afc8ff](https://github.com/peterbuga/rationarr/commit/4afc8ff1334ebd3fe5906b8fe5bf5ce8d8edbbd0))
+
+
+### Bug Fixes
+
+* [app] `build_url` host always string ([c77d569](https://github.com/peterbuga/rationarr/commit/c77d56922baa06010e7cf795d15c390488e92c5e))
+* [app] alembic imports ([18e71e1](https://github.com/peterbuga/rationarr/commit/18e71e15c37d62530102aed23cd68998a4ef0065))
+* [app] Creating FastAPI dynamic static routes for NextJS build ([5f6ca37](https://github.com/peterbuga/rationarr/commit/5f6ca3759ccaec9e41be2f885062ce96e24bdfe4))
+* [app] Destroy FlareSolverr sessions ([f8d8ea3](https://github.com/peterbuga/rationarr/commit/f8d8ea33091924794eb4c150b10cb112e81cb273))
+* [app] Move scheduler store to db ([4aa9829](https://github.com/peterbuga/rationarr/commit/4aa9829316a9fd57d5197acf3048cfc1cabd04cf))
+* [app] Remove scheduler executors ([66f7a10](https://github.com/peterbuga/rationarr/commit/66f7a104b48432cbe61b07f7973b3ce8dddd8cd3))
+* [app] Scheduler async ([6e6fe67](https://github.com/peterbuga/rationarr/commit/6e6fe67bf64a75b8dcbb19133ca9d2284c6355d1))
+* [web] build ([97ba65a](https://github.com/peterbuga/rationarr/commit/97ba65aa8ca63fd5c87a6dd81fe4e27399843c6e))
+* [web] Chart download/upload sizes with 0 values ([90b6aa4](https://github.com/peterbuga/rationarr/commit/90b6aa48cdf35262e9345a14c0f489447cd662f4))
+* [web] Chart tooltip date ([14f7ae0](https://github.com/peterbuga/rationarr/commit/14f7ae03677ed064ed474a859330f0e1b2170105))
+* [web] Date asc sort chart data ([40ce7d7](https://github.com/peterbuga/rationarr/commit/40ce7d7c8924cc2f88340496d383da08a2cfcdb5))
+* [web] Do not plot data-empty keys ([fe1d8eb](https://github.com/peterbuga/rationarr/commit/fe1d8ebed5e01d493e8a5ab397b338de056b7da3))
+* [web] Safari charts display ([bbc4218](https://github.com/peterbuga/rationarr/commit/bbc421884675f0498ed285724c09fb318f7070f8))
+* alembic run with async conn ([d6f415b](https://github.com/peterbuga/rationarr/commit/d6f415bdb72fda220cb0573e1ba015dbcc13b4be))
+* Dockerfile add `rationarr` user ([12268d3](https://github.com/peterbuga/rationarr/commit/12268d32759394700266b37cfe5a719b3a14427a))
+* Dockerfile add `rationarr` user ([5a419da](https://github.com/peterbuga/rationarr/commit/5a419da44348c578cc7594eb59311897b5364649))
+* Dockerfile build ([67ce467](https://github.com/peterbuga/rationarr/commit/67ce4674db2b98f8ef0a047bb3bd3b8e19df655e))
+* Dockerfile entrypoint ([74afaa7](https://github.com/peterbuga/rationarr/commit/74afaa7bd1ce0e066734259461e9273539c856f7))
+* FLARESOULVERR_URL env var optional ([6bb5c0a](https://github.com/peterbuga/rationarr/commit/6bb5c0a30e1041980a9b4babc008289fdcc3d36d))
+* Max chart height ([0e88f42](https://github.com/peterbuga/rationarr/commit/0e88f42f28d1e954f5bf3311d2c39119e1721f1c))
+* Missing component `key` ([980ad17](https://github.com/peterbuga/rationarr/commit/980ad1785e76b79486f0ccdced9e2180eab2b7bf))
+* Run only 1 worker-scheduler in prod ([112a8dd](https://github.com/peterbuga/rationarr/commit/112a8dd0bb72154571489a3c09bfbbe046e1cb7f))
