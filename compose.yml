@@ -2,7 +2,7 @@ name: rationarr
 
 services:
   rationarr-app:
-    image: "peterbuga/rationarr"
+    image: "ghcr.io/peterbuga/rationarr"
     container_name: rationarr-app
     hostname: rationarr-app
     healthcheck:

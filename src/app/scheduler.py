@@ -13,6 +13,7 @@ from app.dependencies import get_scheduler
 from app.indexers.base_indexer import BaseIndexer
 from app.models import Indexer, Scraper
 from app.utils.flaresolverr import flarsolverr_destroy_session
+from app.dependencies import SchedulerSessionDep
 
 
 async def get_indexer_instance(indexer: Indexer) -> BaseIndexer:
@@ -42,7 +43,7 @@ async def scheduled_crawls():
         indexers = result.scalars().all()
 
     for indexer in indexers:
-        logging.warning(f"Job interval added for {indexer.name}")
+        logging.info(f"Gathering stats for {indexer.name}")
 
         try:
             indexer_instance = await get_indexer_instance(indexer)
@@ -115,15 +116,13 @@ async def exchange_points():
                 await flarsolverr_destroy_session(indexer.type)
 
 
-async def start_scheduler():
-    scheduler = get_scheduler()
+async def start_scheduler(scheduler: SchedulerSessionDep = get_scheduler()):
     scheduler.add_job(
         func=scheduled_crawls,
         trigger=IntervalTrigger(seconds=settings.INTERVAL_SCRAPE),
         misfire_grace_time=30,
         id="scheduled_crawls",
         name="scheduled_crawls",
-        # name=slugify(indexer.name, separator="_"),
         replace_existing=True,
     )
 
@@ -131,7 +130,6 @@ async def start_scheduler():
         func=exchange_points,
         trigger=CronTrigger(hour="*/6", minute=15, second=30),
         # trigger=CronTrigger(second="*/10"),
-        # trigger=IntervalTrigger(seconds=30),
         misfire_grace_time=30,
         id="echange_points",
         name="echange_points",
