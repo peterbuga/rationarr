@@ -17,11 +17,14 @@ def create_scheduler() -> AsyncIOScheduler:
                 url=str(settings.DATABASE_URI).replace("+asyncpg", ""),
             )
         },
-        job_defaults={"coalesce": False, "max_instances": 1},
+        job_defaults={
+            "coalesce": True,
+            "max_instances": 1,
+            "misfire_grace_time": None,
+        },
         timezone="UTC",
     )
-    scheduler.start()
-
+    scheduler.start(True)
     return scheduler
 
 

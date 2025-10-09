@@ -52,6 +52,12 @@ def is_primary_worker() -> bool:
 
 @app.on_event("startup")
 async def startup_event():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
+    logging.getLogger().setLevel(logging.INFO)
+
     if is_primary_worker():
         await start_scheduler()
 
