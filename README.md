@@ -9,7 +9,8 @@
       </h1>
       <p align="center">
         <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="">
-        <a href="https://github.com/peterbuga/rationarr/actions"><img src="https://img.shields.io/github/actions/workflow/status/peterbuga/rationarr/pages/pages-build-deployment" alt="Github Actions"></a>
+        <a href="https://github.com/peterbuga/rationarr/actions"><img src="https://img.shields.io/github/actions/workflow/status/peterbuga/rationarr/build.yml" alt="Github Actions"></a>
+        <a href="https://github.com/peterbuga/rationarr/actions"><img src=https://img.shields.io/github/v/release/peterbuga/rationarr.svg alt="Releases"></a>
         <a href="https://github.com/peterbuga/rationarr/blob/master/LICENSE"><img src="https://img.shields.io/github/license/peterbuga/rationarr.svg" alt="LICENSE"></a>
         </p>
     </summary>

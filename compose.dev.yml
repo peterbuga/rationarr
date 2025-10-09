@@ -39,10 +39,10 @@ services:
       - "traefik.http.routers.rationarrapp.rule=Host(`localhost`) && (PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`) || PathPrefix(`/openapi.json`))"
       - "traefik.http.routers.rationarrapp.entrypoints=web"
 
-  rationarr-trfk:
+  rationarr-traefik:
     image: traefik
-    container_name: rationarr-trfk
-    hostname: rationarr-trfk
+    container_name: rationarr-traefik
+    hostname: rationarr-traefik
     ports:
       - "8009:80"
     command:
@@ -53,20 +53,20 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
-  rationarr-prwlr:
+  rationarr-prowlarr:
     image: "linuxserver/prowlarr"
-    container_name: "rationarr-prwlr"
-    hostname: "rationarr-prwlr"
+    container_name: "rationarr-prowlarr"
+    hostname: "rationarr-prowlarr"
     restart: "unless-stopped"
     environment:
       PROWLARR__AUTH__APIKEY: "${PROWLARR_APIKEY}"
     ports:
       - "9696:9696"
 
-  rationarr-flrslvrr:
+  rationarr-flaresolverr:
     image: "flaresolverr/flaresolverr"
-    container_name: "rationarr-flr"
-    hostname: "rationarr-flr"
+    container_name: "rationarr-flaresolverr"
+    hostname: "rationarr-flaresolverr"
     restart: "unless-stopped"
     environment:
       TZ: "UTC"
