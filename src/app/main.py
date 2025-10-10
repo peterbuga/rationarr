@@ -72,7 +72,7 @@ else:
     # serve static files
     # app.mount("/", StaticFiles(directory="dist", html=True), name="dist")
 
-    @app.get("/")
+    @app.get("/", include_in_schema=False)
     async def index():
         return FileResponse("dist/index.html")
 
@@ -97,10 +97,12 @@ else:
         app.add_api_route(
             f"/{path_route}",
             create_endpoint(path_route),
-            methods=["GET", "POST"],
+            methods=["GET"],
+            include_in_schema=False,
         )
         app.add_api_route(
             f"/{path_route}.txt",
             create_endpoint(f"{path_route}.txt"),
             methods=["GET"],
+            include_in_schema=False,
         )
