@@ -118,17 +118,19 @@ async def exchange_points():
 async def start_scheduler(scheduler: SchedulerSessionDep = get_scheduler()):
     scheduler.resume()
 
-    scheduler.scheduled_job(
+    scheduler.add_job(
         id="scheduled_crawls",
         name="scheduled_crawls",
         func=scheduled_crawls,
         trigger=IntervalTrigger(seconds=settings.INTERVAL_SCRAPE),
+        replace_existing=True,
     )
 
-    scheduler.scheduled_job(
+    scheduler.add_job(
         id="echange_points",
         name="echange_points",
         func=exchange_points,
         trigger=CronTrigger(hour="*/6", minute=15, second=30),
+        replace_existing=True,
         # trigger=CronTrigger(second="*/10"),
     )
