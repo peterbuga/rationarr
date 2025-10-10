@@ -10,8 +10,7 @@ from sqlalchemy import update
 
 from app.config import settings
 from app.indexers.base_indexer import BaseIndexer
-from app.models import Scraper
-from app.models.indexer import Indexer
+from app.models import Activity, Indexer, Scraper
 from app.schemas.common import ScraperFields
 from app.utils.cookie import cookie_str_to_dict, dict_to_cookie_str
 from app.utils.url import build_url
@@ -20,8 +19,69 @@ from app.utils.url import build_url
 class Hdspace(BaseIndexer):
     alias = "HDS"
 
+    points_map = {
+        600: {"value": "3", "desc": "1 GB upload"},
+        1100: {"value": "4", "desc": "2 GB upload"},
+        2700: {"value": "5", "desc": "5 GB upload"},
+        5200: {"value": "6", "desc": "10 GB upload"},
+        10000: {"value": "invite", "desc": "1 invite"},
+        15000: {"value": "invite2", "desc": "2 invites"},
+        20000: {"value": "invite3", "desc": "3 invites"},
+    }
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    async def exchange_points(self, total_points, target_points):
+        exchange_points_url = build_url(
+            host=self.url,
+            path="seedbonus_exchange.php",
+            query={"id": self.points_map[target_points]["value"]},
+        )
+
+        async with httpx.AsyncClient(timeout=60) as client:
+            cookies_dict = cookie_str_to_dict(self.cookie)
+
+            params = {"submit": "Exchange!"}
+            response = await client.post(
+                url=str(settings.FLARESOLVERR_URL),
+                headers={"Content-Type": "application/json"},
+                json={
+                    "cmd": "request.post",
+                    "url": exchange_points_url,
+                    "session": self.type,
+                    "postData": urllib.parse.urlencode(params),
+                    "cookies": [
+                        {"name": c[0], "value": c[1]}
+                        for c in cookies_dict.items()
+                    ],
+                },
+            )
+            response.raise_for_status()
+            solverr_data = response.json()
+
+            # save latest cookies
+            cookies = {
+                cookie["name"]: cookie["value"]
+                for cookie in solverr_data["solution"]["cookies"]
+            }
+
+            cookies_str = dict_to_cookie_str(cookies)
+            await self.db_session.execute(
+                update(Indexer)
+                .where(Indexer.id == self.indexer_id)
+                .values(cookie=cookies_str)
+            )
+            await self.db_session.commit()
+
+        activity_data = Activity(
+            **{
+                "indexer_id": self.indexer_id,
+                "activity": f"{target_points} bonus points exchanged for {self.points_map[target_points]['desc']}.",
+            }
+        )
+        self.db_session.add(activity_data)
+        await self.db_session.commit()
 
     async def extract_info(self):
         async with httpx.AsyncClient(timeout=60) as client:
