@@ -24,6 +24,10 @@
   </ul>
 </div>
 
+> [!WARNING]
+> ⚠️ This is very much still work in progress! There are no safety measures in place, DO NOT expose the app to the internet, place it behind IAM apps like Authelia/Authentik/KeyCloak etc or limit strictly to internal/vpn network use!
+> 
+
 ## 📝 Table of Contents
 
 1. [Preview](#preview)
@@ -61,11 +65,10 @@ Support for indexers is basic so far due to PoC-level, more to come:
 * *generic UNIT3D-based indexer*
 
 ## <a name="installation"></a> 🖥️ Getting started
-!!! Currently no stable release (soon), it can be run from development docker command below.
 
 ### Requirements
 * docker
-* a running and accessible Prowlarr instance
+* a running and accessible [Prowlarr](https://prowlarr.com) instance
 * (optional) [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) instance (not included by default in base `compose.yml`)
 
 Copy `.env.template` to `.env`, fill up the required envs and run:
@@ -73,6 +76,8 @@ Copy `.env.template` to `.env`, fill up the required envs and run:
 ```bash
 docker compose up -d
 ```
+
+As a minimum security the app runs as non-root user `1000:1000`.
 
 ## <a name="development"></a> 🪚 Development
 
