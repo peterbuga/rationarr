@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     PROWLARR_HOST: HttpUrl
     PROWLARR_APIKEY: str
-    FLARESOULVERR_URL: Optional[HttpUrl] = None
+    FLARESOLVERR_URL: Optional[HttpUrl] = None
     INTERVAL_SCRAPE: int = 2 * 3600
 
 

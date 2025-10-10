@@ -17,7 +17,7 @@ services:
     environment:
       PROWLARR_HOST: "${PROWLARR_HOST}"
       PROWLARR_APIKEY: "${PROWLARR_APIKEY}"
-      FLARESOULVERR_URL: "${FLARESOULVERR_URL}"
+      FLARESOLVERR_URL: "${FLARESOLVERR_URL}"
       DATABASE_URI: "postgresql+asyncpg://${POSTGRES_USER:-rationarr}:${POSTGRES_PASSWORD:-rationarr}@${POSTGRES_HOST:-rationarr-db}:${POSTGRES_PORT}/${POSTGRES_DB:-rationarr}"
     depends_on:
       - rationarr-db

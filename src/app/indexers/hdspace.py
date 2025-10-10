@@ -41,7 +41,7 @@ class Hdspace(BaseIndexer):
             )
 
             response = await client.post(
-                url=str(settings.FLARESOULVERR_URL),
+                url=str(settings.FLARESOLVERR_URL),
                 headers={"Content-Type": "application/json"},
                 json={
                     "cmd": "request.get",
@@ -75,7 +75,7 @@ class Hdspace(BaseIndexer):
 
                 params = {"uid": self.username, "pwd": self.password}
                 response = await client.post(
-                    url=str(settings.FLARESOULVERR_URL),
+                    url=str(settings.FLARESOLVERR_URL),
                     headers={"Content-Type": "application/json"},
                     json={
                         "cmd": "request.post",
