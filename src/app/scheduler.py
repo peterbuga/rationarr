@@ -46,11 +46,34 @@ async def scheduled_crawls():
 
         try:
             indexer_instance = await get_indexer_instance(indexer)
-            await indexer_instance.extract_info()
+            async with indexer_instance as instance:
+                await instance.extract_info()
         except Exception as e:
             logging.error(f"Failed to crawl {indexer.url}: {e}")
+        finally:
+            await flarsolverr_destroy_session(indexer.type)
 
-        await flarsolverr_destroy_session(indexer.type)
+
+async def redeem_claims():
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(Indexer)
+            .where(Indexer.active.is_(True))
+            .order_by(Indexer.created_at)
+        )
+        indexers = result.scalars().all()
+
+    for indexer in indexers:
+        logging.info(f"Redeeming claims for {indexer.name}")
+
+        try:
+            indexer_instance = await get_indexer_instance(indexer)
+            async with indexer_instance as instance:
+                await instance.redeem_claim()
+        except Exception as e:
+            logging.error(f"Failed check or redeem claims {indexer.url}: {e}")
+        finally:
+            await flarsolverr_destroy_session(indexer.type)
 
 
 async def exchange_points():
@@ -105,10 +128,11 @@ async def exchange_points():
                 )
 
                 try:
-                    await indexer_instance.exchange_points(
-                        total_points=float(indexer_point.get("points")),
-                        target_points=indexer.exchange_points,
-                    )
+                    async with indexer_instance as instance:
+                        await instance.exchange_points(
+                            total_points=float(indexer_point.get("points")),
+                            target_points=indexer.exchange_points,
+                        )
                 except Exception as e:
                     logging.error(f"Exchange points: {str(e)}")
 
@@ -127,10 +151,19 @@ async def start_scheduler(scheduler: SchedulerSessionDep = get_scheduler()):
     )
 
     scheduler.add_job(
-        id="echange_points",
-        name="echange_points",
+        id="exchange_points",
+        name="exchange_points",
         func=exchange_points,
         trigger=CronTrigger(hour="*/6", minute=15, second=30),
         replace_existing=True,
         # trigger=CronTrigger(second="*/10"),
+    )
+
+    scheduler.add_job(
+        id="redeem_claims",
+        name="redeem_claims",
+        func=redeem_claims,
+        trigger=CronTrigger(hour="*/3", minute=45, second=0),
+        replace_existing=True,
+        # trigger=CronTrigger(minute="*/3"),
     )

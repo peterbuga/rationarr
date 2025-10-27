@@ -1,14 +1,11 @@
 import logging
 
-import httpx
 from bs4 import BeautifulSoup
 from slugify import slugify
-from sqlalchemy import update
 
 from app.indexers.base_indexer import BaseIndexer
-from app.models import Activity, Indexer, Scraper
+from app.models import Activity, Scraper
 from app.schemas.scenetime import ScenetimeScraperFields
-from app.utils.cookie import dict_to_cookie_str
 from app.utils.url import build_url
 
 
@@ -52,25 +49,15 @@ class Scenetime(BaseIndexer):
             }
         )
 
-        async with httpx.AsyncClient(
-            headers=self.headers, timeout=10, cookies=self.cookie
-        ) as client:
-            post_data = {
-                "opt": self.points_map[target_points]["value"],
-                "type": "bpxch",
-            }
-            response = await client.post(exchange_points_url, data=post_data)
-            response.raise_for_status()
+        post_data = {
+            "opt": self.points_map[target_points]["value"],
+            "type": "bpxch",
+        }
+        response = await self.client.post(exchange_points_url, data=post_data)
+        response.raise_for_status()
 
-            # TODO check for valid response
-            new_cookies = dict_to_cookie_str(dict(client.cookies))
-
-        await self.db_session.execute(
-            update(Indexer)
-            .where(Indexer.id == self.indexer_id)
-            .values(cookie=new_cookies)
-        )
-        await self.db_session.commit()
+        # TODO check for valid response
+        await self.save_cookies(dict(self.client.cookies))
 
         activity_data = Activity(
             **{
@@ -82,59 +69,49 @@ class Scenetime(BaseIndexer):
         await self.db_session.commit()
 
     async def extract_info(self):
-        async with httpx.AsyncClient(
-            headers=self.headers, timeout=10, cookies=self.cookie
-        ) as client:
-            # get the user details page
-            user_details_url = build_url(
-                host=self.url,
-                path="userdetails.php",
-                query={"id": self.cookie["uid"]},
+        # get the user details page
+        user_details_url = build_url(
+            host=self.url,
+            path="userdetails.php",
+            query={"id": self.cookie["uid"]},
+        )
+        response = await self.client.get(user_details_url)
+        response.raise_for_status()
+
+        await self.save_cookies(dict(self.client.cookies))
+
+        scrapers = []
+        user_details_bs = BeautifulSoup(response.text, "html.parser")
+        user = user_details_bs.find("h2")
+        my_info = user_details_bs.find("table", {"class": "desc-table"})
+
+        infos = [
+            [i.text for i in tr.find_all("td")] for tr in my_info.find_all("tr")
+        ]
+        infos.append(["user", user.text])
+
+        for info in infos:
+            attribute, value, *_ = [i.strip() for i in info] + [None] * (
+                2 - len(info)
             )
-            response = await client.get(user_details_url)
-            response.raise_for_status()
-
-            new_cookies = dict_to_cookie_str(dict(client.cookies))
-            await self.db_session.execute(
-                update(Indexer)
-                .where(Indexer.id == self.indexer_id)
-                .values(cookie=new_cookies)
+            attribute = slugify(attribute, separator="_").replace(
+                "class", "class_"
             )
-            await self.db_session.commit()
 
-            scrapers = []
-            user_details_bs = BeautifulSoup(response.text, "html.parser")
-            user = user_details_bs.find("h2")
-            my_info = user_details_bs.find("table", {"class": "desc-table"})
-
-            infos = [
-                [i.text for i in tr.find_all("td")]
-                for tr in my_info.find_all("tr")
-            ]
-            infos.append(["user", user.text])
-
-            for info in infos:
-                attribute, value, *_ = [i.strip() for i in info] + [None] * (
-                    2 - len(info)
-                )
-                attribute = slugify(attribute, separator="_").replace(
-                    "class", "class_"
-                )
-
-                if attribute in ScenetimeScraperFields.get_keys():
-                    scrapers.append(
-                        Scraper(
-                            **{
-                                "indexer_id": self.indexer_id,
-                                "attribute": getattr(
-                                    ScenetimeScraperFields, attribute
-                                ),
-                                "value": str(value),
-                            }
-                        )
+            if attribute in ScenetimeScraperFields.get_keys():
+                scrapers.append(
+                    Scraper(
+                        **{
+                            "indexer_id": self.indexer_id,
+                            "attribute": getattr(
+                                ScenetimeScraperFields, attribute
+                            ),
+                            "value": str(value),
+                        }
                     )
-                else:
-                    logging.debug(f"Field not tracked: {attribute} = {value}")
+                )
+            else:
+                logging.debug(f"Field not tracked: {attribute} = {value}")
 
-            self.db_session.add_all(scrapers)
-            await self.db_session.commit()
+        self.db_session.add_all(scrapers)
+        await self.db_session.commit()
