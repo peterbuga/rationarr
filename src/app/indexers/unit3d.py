@@ -31,7 +31,7 @@ class Unit3d(BaseIndexer):
         }
 
     async def _login(self):
-        if not self.username or self.password:
+        if not self.username or not self.password:
             raise Exception("Missing login information")
 
         homepage_url = build_url(host=self.url)
