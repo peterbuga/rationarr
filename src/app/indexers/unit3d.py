@@ -135,7 +135,7 @@ class Unit3d(BaseIndexer):
                 )
 
                 logging.warning(f"claim POST info: {claim_url} - {token}")
-
+                time.sleep(random.randint(10, 20))
                 response = await self.client.post(
                     url=claim_url,
                     headers=headers,

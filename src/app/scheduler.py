@@ -139,7 +139,7 @@ async def exchange_points():
                 await flarsolverr_destroy_session(indexer.type)
 
 
-async def start_scheduler(scheduler: SchedulerSessionDep = get_scheduler()):
+async def start_scheduler(scheduler: SchedulerSessionDep = get_scheduler()): # pyright: ignore[reportInvalidTypeForm]
     scheduler.resume()
 
     scheduler.add_job(
