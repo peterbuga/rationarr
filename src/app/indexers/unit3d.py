@@ -31,6 +31,9 @@ class Unit3d(BaseIndexer):
         }
 
     async def _login(self):
+        if not self.username or self.password:
+            raise Exception("Missing login information")
+
         homepage_url = build_url(host=self.url)
         login_url = build_url(
             host=self.url,
@@ -130,11 +133,15 @@ class Unit3d(BaseIndexer):
                         "Referer": event_url,
                     }
                 )
+
+                logging.warning(f"claim POST info: {claim_url} - {token}")
+
                 response = await self.client.post(
-                    claim_url,
+                    url=claim_url,
                     headers=headers,
                     data={"_token": token.get("value")},
                 )
+                response.raise_for_status()
 
                 event_page_bs = BeautifulSoup(response.text, "html.parser")
                 prizes = event_page_bs.select("li > i.events__prize-message")
@@ -148,6 +155,7 @@ class Unit3d(BaseIndexer):
                             "activity": f"Claim redeemed for {prize}.",
                         }
                     )
+                    logging.info(f"Claimed {prize}")
                     self.db_session.add(activity_data)
                     await self.db_session.commit()
 
