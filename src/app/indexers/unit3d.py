@@ -1,6 +1,7 @@
 import copy
 import logging
 import random
+import re
 import time
 
 import pyotp
@@ -147,7 +148,7 @@ class Unit3d(BaseIndexer):
                 prizes = event_page_bs.select("li > i.events__prize-message")
 
                 if prizes:
-                    prize = prizes[-1].getText().strip()
+                    prize = re.sub(r"\s+", " ", prizes[-1].getText()).strip()
 
                     activity_data = Activity(
                         **{

@@ -30,15 +30,15 @@ RUN ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime
 
 WORKDIR $HOMEDIR
 
-COPY pyproject.toml README.md ./
+COPY --chown=${APP_USER}:${APP_USER} pyproject.toml README.md ./
 RUN pip install --no-cache-dir -e .
 
-COPY src/app/ ./app/
-COPY alembic/ ./alembic/
-COPY alembic.ini .
-COPY --from=build /code/src/web/out ./dist
+COPY --chown=${APP_USER}:${APP_USER} src/app/ ./app/
+COPY --chown=${APP_USER}:${APP_USER} alembic/ ./alembic/
+COPY --chown=${APP_USER}:${APP_USER} alembic.ini .
+COPY --chown=${APP_USER}:${APP_USER} --from=build /code/src/web/out ./dist
 
-COPY <<-EOT /entrypoint.sh
+COPY --chown=${APP_USER}:${APP_USER} <<-EOT /entrypoint.sh
 #!/bin/sh
 
 alembic upgrade head
